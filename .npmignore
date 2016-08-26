@@ -1,0 +1,17 @@
+.idea
+typings
+
+# testing
+karma.conf.js
+test.bundle.js
+coverage
+
+# configs
+typings.json
+tsconfig.json
+
+#typescript sources
+*.ts
+*.js.map
+!*.d.ts
+!/src/**/*.d.ts

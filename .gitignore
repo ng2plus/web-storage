@@ -1,0 +1,9 @@
+.idea
+typings
+node_modules
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+index.js
+index.d.ts
+index.js.map
