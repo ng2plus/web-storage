@@ -1,2 +1,2 @@
-## Absolute solution for web storage in Angular2
+## Ultimate solution for web storage for Angular2
 
