@@ -4,7 +4,9 @@ import { Observable } from 'rxjs/Observable';
 import {WebStorageService} from './web-storage.service';
 
 describe('WebStorage Service', () => {
-  let storage: WebStorageService;
+  let storage: WebStorageService,
+    testKey = 'key',
+    testVal = 'val';
 
   beforeEach(() => {
     let injector = ReflectiveInjector.resolveAndCreate([
@@ -14,15 +16,23 @@ describe('WebStorage Service', () => {
     storage = injector.get(WebStorageService);
   });
 
-  it(`should be empty when key doesn't exists`, () => {
-    expect(storage.get('key')).toBeNull();
+  it(`should be 'null' when trying to get the key that doesn't exists`, () => {
+    expect(storage.get(testKey)).toBeNull();
   });
 
   it(`should set value`, () => {
-    expect(() => storage.set('key', 'val')).not.toThrow();
+    expect(() => storage.set(testKey, testVal)).not.toThrow();
   });
 
   it(`should get the value`, () => {
-      expect(storage.get('key')).toEqual('val');
-    });
+    expect(storage.get(testKey)).toEqual(testVal);
+  });
+
+  it(`should remove the value`, () => {
+    expect(storage.remove(testKey)).toEqual(testVal);
+  });
+
+  it(`should be empty`, () => {
+    expect(storage.length).toEqual(0);
+  });
 });
