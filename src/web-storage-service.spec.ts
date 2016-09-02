@@ -2,6 +2,7 @@ import { ReflectiveInjector } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import {WebStorageService} from './web-storage.service';
+import {WebStorageValidator} from './web-storage.validator';
 
 describe('WebStorage Service', () => {
   let storage: WebStorageService,
@@ -11,6 +12,7 @@ describe('WebStorage Service', () => {
   beforeEach(() => {
     let injector = ReflectiveInjector.resolveAndCreate([
       WebStorageService,
+      WebStorageValidator
     ]);
 
     storage = injector.get(WebStorageService);
@@ -29,7 +31,7 @@ describe('WebStorage Service', () => {
   });
 
   it(`should remove the value`, () => {
-    expect(storage.remove(testKey)).toEqual(testVal);
+    expect(storage.remove(testKey)).toEqual(testVal); // TODO fails
   });
 
   it(`should be empty`, () => {

@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {storageConfig, StorageConfig} from './config/storage-config';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
+import {WebStorageValidator} from './web-storage.validator';
 
 @Injectable()
 export class WebStorageService {
   private config: StorageConfig = storageConfig;
   private storage: WebStorage;
 
-  constructor() {
+  constructor(private validator: WebStorageValidator) {
     this.init();
   }
 
@@ -74,16 +75,17 @@ export class WebStorageService {
   }
 
   private init(): void {
+    this.validator.isAvailable(this.config.storageProvider);
     this.storage = this.getStorageInstance();
   }
 
   private getStorageInstance(): WebStorage {
     if (this.config.storageProvider === 'localStorage') {
-      return <WebStorage>localStorage;
+      return <WebStorage>window.localStorage;
     }
 
     if (this.config.storageProvider === 'localStorage') {
-      return <WebStorage>sessionStorage;
+      return <WebStorage>window.sessionStorage;
     }
 
     throw new TypeError('Unknown storage provider');

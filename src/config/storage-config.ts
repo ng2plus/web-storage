@@ -1,3 +1,5 @@
+import {DefaultWebStorageType} from '../web-storage-type';
+
 let storageConfigDefault: StorageConfig = {
   deserializeObjects: true,
   deserializeNumberLikeStrings: true,
@@ -19,7 +21,7 @@ export interface StorageConfig {
   deserializeObjects?: boolean,
   deserializeNumberLikeStrings?: boolean,
   prefix?: string,
-  storageProvider?: 'localStorage' | 'sessionStorage'/* | 'localForage'*/,
+  storageProvider?: DefaultWebStorageType/* | 'localForage'*/,
   notifyOn?: NotifyOptions, // emit change, update, add, etc. events
   storeMetaData?: boolean // to use features like deleteAll(prefix (default is what in config))
 }
