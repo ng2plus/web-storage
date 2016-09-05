@@ -22,14 +22,14 @@ export class WebStorageService {
     return this.keys().length;
   }
 
-  @prefixedKey
+  @addPrefixToKey
   get<T>(key: string, defaultVal = null): T {
     let item = this.storage.getItem(key);
 
     return item === null ? defaultVal : item;
   }
 
-  @prefixedKey
+  @addPrefixToKey
   set(key: string, item: any) {
     this.storage.setItem(key, item);
   }
@@ -38,9 +38,9 @@ export class WebStorageService {
     return this.get(key) !== null;
   }
 
-  @prefixedKey
+  @addPrefixToKey
   remove<T>(key: string): T {
-    let removed = this.get<T>(this.fromKey(key));
+    let removed = this.get<T>(this.extractKey(key));
 
     this.storage.removeItem(key);
 
@@ -61,7 +61,7 @@ export class WebStorageService {
 
     for (let key in this.storage) {
       if (key.startsWith(`${this.config.prefix}:`)) {
-        keyStr = this.fromKey(key);
+        keyStr = this.extractKey(key);
         fn(this.get(keyStr, defaultVal), keyStr);
       }
     }
@@ -70,7 +70,7 @@ export class WebStorageService {
   keys(): string[] {
     const keys = [];
 
-    return this.forEach((item: any, key: string) => {keys.push(this.fromKey(key))}), keys;
+    return this.forEach((item: any, key: string) => {keys.push(this.extractKey(key))}), keys;
   }
 
   private init(): void {
@@ -90,19 +90,19 @@ export class WebStorageService {
     throw new TypeError('Unknown storage provider');
   }
 
-  private toKey(str: string): string {
+  private prefixKey(str: string): string {
     return `${this.config.prefix}:${str}`;
   }
 
-  private fromKey(key: string): string {
+  private extractKey(key: string): string {
     return key.substr(`${this.config.prefix}:`.length);
   }
 }
 
-function prefixedKey(target: Object, key: string, value: any) {
+function addPrefixToKey(target: Object, key: string, value: any) {
   return {
     value: function(key: string, ...args: any[]) {
-      return value.value.call(this, this.toKey(key), ...args);
+      return value.value.call(this, this.prefixKey(key), ...args);
     }
   }
 }
