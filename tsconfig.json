@@ -3,14 +3,30 @@
     "module": "commonjs",
     "removeComments": true,
     "target": "es5",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true
+    "declaration": true,
+    "noEmitHelpers": true,
+    "strictNullChecks": false,
+    "baseUrl": "./src"
   },
-  "compileOnSave": true,
-  "files": [
-    "./typings/index.d.ts",
-    "./index.ts"
-  ]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "lib": [
+    "es6"
+  ],
+  "awesomeTypescriptLoaderOptions": {
+    "forkChecker": true,
+    "useWebpackText": true
+  },
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": {
+    "rewriteTsconfig": false
+  }
 }

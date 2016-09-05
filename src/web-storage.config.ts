@@ -1,7 +1,12 @@
-let storageConfigDefault: StorageConfig = {
+import {DefaultWebStorageType} from './web-storage-type';
+import { OpaqueToken } from '@angular/core';
+
+export const WEB_STORAGE_SERVICE_CONFIG = new OpaqueToken('WEB_STORAGE_SERVICE_CONFIG');
+
+export const webStorageConfigDefault: WebStorageConfig = {
   deserializeObjects: true,
   deserializeNumberLikeStrings: true,
-  prefix: '::',
+  prefix: '__',
   storageProvider: 'localStorage',
   notifyOn: {
     set: true,
@@ -13,13 +18,13 @@ let storageConfigDefault: StorageConfig = {
   storeMetaData: true
 };
 
-export const storageConfig = Object.seal(storageConfigDefault);
+// ############ INTERFACES ############
 
-export interface StorageConfig {
+export interface WebStorageConfig {
   deserializeObjects?: boolean,
   deserializeNumberLikeStrings?: boolean,
   prefix?: string,
-  storageProvider?: 'localStorage' | 'sessionStorage'/* | 'localForage'*/,
+  storageProvider?: DefaultWebStorageType/* | 'localForage'*/,
   notifyOn?: NotifyOptions, // emit change, update, add, etc. events
   storeMetaData?: boolean // to use features like deleteAll(prefix (default is what in config))
 }
