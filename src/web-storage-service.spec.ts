@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 
 import {WebStorageService} from './web-storage.service';
 import {WebStorageValidator} from './web-storage.validator';
+import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault} from './web-storage.config';
 
 describe('WebStorage Service', () => {
   let storage: WebStorageService,
@@ -12,7 +13,8 @@ describe('WebStorage Service', () => {
   beforeEach(() => {
     let injector = ReflectiveInjector.resolveAndCreate([
       WebStorageService,
-      WebStorageValidator
+      WebStorageValidator,
+      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
     ]);
 
     storage = injector.get(WebStorageService);

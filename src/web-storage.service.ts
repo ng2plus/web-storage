@@ -1,19 +1,18 @@
-import {Injectable} from '@angular/core';
-import {storageConfig, StorageConfig} from './config/storage-config';
+import {Injectable, Inject} from '@angular/core';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
 import {WebStorageValidator} from './web-storage.validator';
+import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig} from './web-storage.config';
 
 @Injectable()
 export class WebStorageService {
-  private config: StorageConfig = storageConfig;
   private storage: WebStorage;
 
-  constructor(private validator: WebStorageValidator) {
+  constructor(@Inject(WEB_STORAGE_SERVICE_CONFIG) private config: WebStorageConfig, private validator: WebStorageValidator) {
     this.init();
   }
 
-  setup(config: StorageConfig) {
+  setup(config: WebStorageConfig) {
     utils.defaults(this.config, config);
     this.init();
   }
@@ -83,7 +82,7 @@ export class WebStorageService {
       return <WebStorage>window.localStorage;
     }
 
-    if (this.config.storageProvider === 'localStorage') {
+    if (this.config.storageProvider === 'sessionStorage') {
       return <WebStorage>window.sessionStorage;
     }
 
