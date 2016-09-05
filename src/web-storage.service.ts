@@ -34,14 +34,13 @@ export class WebStorageService {
     this.storage.setItem(key, item);
   }
 
-  @prefixedKey
   has(key: string): boolean {
     return this.get(key) !== null;
   }
 
   @prefixedKey
   remove<T>(key: string): T {
-    let removed = this.get<T>(key);
+    let removed = this.get<T>(this.fromKey(key));
 
     this.storage.removeItem(key);
 
