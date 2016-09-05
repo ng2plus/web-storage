@@ -20,11 +20,6 @@
   "lib": [
     "es6"
   ],
-  "types": [
-    "jasmine",
-    "node",
-    "webpack"
-  ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
     "useWebpackText": true
