@@ -1,24 +1,47 @@
-import {Injectable, Inject} from '@angular/core';
+import {Injectable, Inject, EventEmitter} from '@angular/core';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
-import {WebStorageValidator} from './web-storage.validator';
 import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig} from './web-storage.config';
+import {LocalStorageProvider, localStorageProviderName} from './provider/default/local-storage-provider';
+import {StorageProvider} from './provider/storage-provider';
+import {SessionStorageProvider, sessionStorageProviderName} from './provider/default/session-storage-provider';
+import {Observable, ReplaySubject} from 'rxjs';
 
 @Injectable()
 export class WebStorageService {
+  onError: ReplaySubject<string> = new ReplaySubject<string>(1);
+
   private storage: WebStorage;
+  private providers: {[index: string]: StorageProvider} = {};
 
-  constructor(@Inject(WEB_STORAGE_SERVICE_CONFIG) private config: WebStorageConfig, private validator: WebStorageValidator) {
-    this.init();
-  }
-
-  setup(config: WebStorageConfig) {
-    utils.defaults(this.config, config);
+  constructor(@Inject(WEB_STORAGE_SERVICE_CONFIG) private config: WebStorageConfig) {
+    this.addDefaultProviders();
     this.init();
   }
 
   get length(): number {
     return this.keys().length;
+  }
+
+  addProvider(name: string, value: StorageProvider) {
+    this.providers[name] = value;
+  }
+
+  useProvider(providerName: string): void {
+    this.validateProvider(providerName).subscribe(utils.noop, err => this.onError.next(err));
+  }
+
+  private validateProvider(providerName: string): Observable<WebStorage> {
+    if (!this.providers[providerName]) {
+      return Observable.throw(`Unknown provider`); // TODO change to error constants
+    }
+
+    return this.providers[providerName].validate().map(storage => this.storage = storage);
+  }
+
+  setup(config: WebStorageConfig) {
+    this.config = utils.merge(this.config, config);
+    this.init();
   }
 
   @addPrefixToKey
@@ -69,24 +92,26 @@ export class WebStorageService {
   keys(): string[] {
     const keys = [];
 
-    return this.forEach((item: any, key: string) => {keys.push(this.extractKey(key))}), keys;
+    return this.forEach((item: any, key: string) => {keys.push(key)}), keys;
+  }
+
+  getAll(): StorageDictionary {
+    const all: StorageDictionary = {};
+
+    this.forEach((item: any, key: string) => {
+      all[key] = item;
+    });
+
+    return all;
   }
 
   private init(): void {
-    this.validator.isAvailable(this.config.storageProvider);
-    this.storage = this.getStorageInstance();
+    this.useProvider(this.config.provider);
   }
 
-  private getStorageInstance(): WebStorage {
-    if (this.config.storageProvider === 'localStorage') {
-      return <WebStorage>window.localStorage;
-    }
-
-    if (this.config.storageProvider === 'sessionStorage') {
-      return <WebStorage>window.sessionStorage;
-    }
-
-    throw new TypeError('Unknown storage provider');
+  private addDefaultProviders() {
+    this.addProvider(localStorageProviderName, new LocalStorageProvider());
+    this.addProvider(sessionStorageProviderName, new SessionStorageProvider());
   }
 
   private prefixKey(str: string): string {
@@ -104,4 +129,8 @@ function addPrefixToKey(target: Object, key: string, value: any) {
       return value.value.call(this, this.prefixKey(key), ...args);
     }
   }
+}
+
+export interface StorageDictionary {
+  [index: string]: any;
 }

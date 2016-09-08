@@ -9,10 +9,12 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "declaration": true,
-    "noEmitHelpers": true,
-    "strictNullChecks": false,
-    "baseUrl": "./src"
+    "noEmitHelpers": false,
+    "strictNullChecks": false
   },
+  "files": [
+    "index.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist"

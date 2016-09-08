@@ -1,1 +1,1 @@
-export type DefaultWebStorageType = 'localStorage' | 'sessionStorage';
+export type DefaultWebStorageProvider = 'localStorage' | 'sessionStorage';
