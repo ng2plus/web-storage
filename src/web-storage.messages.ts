@@ -1,0 +1,3 @@
+export enum WS_ERROR {
+  UNKNOWN_PROVIDER
+}

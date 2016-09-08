@@ -6,6 +6,7 @@ import {LocalStorageProvider, localStorageProviderName} from './provider/default
 import {StorageProvider} from './provider/storage-provider';
 import {SessionStorageProvider, sessionStorageProviderName} from './provider/default/session-storage-provider';
 import {Observable, ReplaySubject} from 'rxjs';
+import {WS_ERROR} from './web-storage.messages';
 
 @Injectable()
 export class WebStorageService {
@@ -28,15 +29,7 @@ export class WebStorageService {
   }
 
   useProvider(providerName: string): void {
-    this.validateProvider(providerName).subscribe(utils.noop, err => this.onError.next(err));
-  }
-
-  private validateProvider(providerName: string): Observable<WebStorage> {
-    if (!this.providers[providerName]) {
-      return Observable.throw(`Unknown provider`); // TODO change to error constants
-    }
-
-    return this.providers[providerName].validate().map(storage => this.storage = storage);
+    this.validateAndSetProvider(providerName).subscribe(utils.noop, err => this.onError.next(err));
   }
 
   setup(config: WebStorageConfig) {
@@ -120,6 +113,22 @@ export class WebStorageService {
 
   private extractKey(key: string): string {
     return key.substr(`${this.config.prefix}:`.length);
+  }
+
+  private validateProvider(providerName: string): Observable<WebStorage> {
+    if (!this.providers[providerName]) {
+      return Observable.throw(WS_ERROR.UNKNOWN_PROVIDER);
+    }
+
+    return this.providers[providerName].validate();
+  }
+
+  private setProvider(storage: WebStorage): WebStorage {
+    return this.storage = storage;
+  }
+
+  private validateAndSetProvider(providerName: string): Observable<WebStorage> {
+    return this.validateProvider(providerName).map(this.setProvider);
   }
 }
 
