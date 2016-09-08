@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "flow.clean": "node node_modules/del-cli/cli typings \"src/**/*.+(js|d.ts|js.map)\" \"index.+(js|d.ts|js.map)\"",
+    "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"index.+(js|d.ts|js.map)\"",
     "flow.compile": "npm run flow.compile:common",
     "flow.compile:common": "tsc -p tsconfig.json",
     "dev.compile": "npm run flow.clean && npm run flow.compile",
