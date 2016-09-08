@@ -2,6 +2,7 @@ import {WebStorageService} from './web-storage.service';
 import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault} from './web-storage.config';
 import {TestBed, inject, async} from '@angular/core/testing';
 import {ReplaySubject} from 'rxjs';
+import {WS_ERROR} from './web-storage.messages';
 
 describe('WebStorage Service', () => {
   let testKey = 'key',
@@ -24,7 +25,7 @@ describe('WebStorage Service', () => {
 
   it(`should be empty`,
     inject([WebStorageService], (storage: WebStorageService) => {
-      expect(storage.length).toBe(0);
+      expect(storage.length).toEqual(0);
     })
   );
 
@@ -98,13 +99,16 @@ describe('WebStorage Service', () => {
       storage.removeAll();
 
       expect(storage.removeAll).toHaveBeenCalled();
-      expect(storage.length).toBe(0);
+      expect(storage.length).toEqual(0);
     })
   );
 
 });
 
 describe('WebStorage Service event', () => {
+  let testKey = 'key',
+    testVal = 'val';
+
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       WebStorageService,
@@ -112,13 +116,51 @@ describe('WebStorage Service event', () => {
     ]
   }));
 
-  it(`'onError' executes if config is wrong`,
+  it(`'onError' fires`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
       expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
 
+      enum ACTION {
+        USE_UNKNOWN_PROVIDER,
+        USE_API_WHEN_PROVIDER_NOT_SET
+      }
+
+      let current: ACTION,
+        spies = {
+          onErrorFn(val) {
+            switch(current) {
+              case ACTION.USE_UNKNOWN_PROVIDER: {
+                expect(val).toBe(WS_ERROR.UNKNOWN_PROVIDER); break;
+              }
+              case ACTION.USE_API_WHEN_PROVIDER_NOT_SET:
+              default: {
+                expect(val).toBe(WS_ERROR.PROVIDER_NOT_SET); break;
+              }
+            }
+          }
+        };
+
+      spyOn(spies, 'onErrorFn').and.callThrough();
+
+      storage.onError.subscribe(spies.onErrorFn);
+
+      // #1
+      current = ACTION.USE_UNKNOWN_PROVIDER;
       storage.useProvider('unknown_provider');
 
-      storage.onError.subscribe((val) => expect(val).toBe(`Unknown provider`));
+      // #2
+      current = ACTION.USE_API_WHEN_PROVIDER_NOT_SET;
+      storage.set(testKey, testVal);
+      storage.length;
+      storage.get(testKey);
+      storage.has(testKey);
+      storage.remove(testKey);
+      storage.removeAll();
+      storage.forEach(() => {});
+      storage.keys();
+      storage.getAll();
+
+      expect(spies.onErrorFn).toHaveBeenCalledTimes(10);
     }))
   );
 });
