@@ -2,11 +2,16 @@ import {Injectable, Inject} from '@angular/core';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
 import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig} from './web-storage.config';
-import {LocalStorageProvider, localStorageProviderName} from './providers/default/local-storage-provider';
-import {StorageProvider} from './providers/storage-provider';
-import {SessionStorageProvider, sessionStorageProviderName} from './providers/default/session-storage-provider';
+import {
+  LocalStorageProvider,
+  localStorageProviderName,
+  SessionStorageProvider,
+  sessionStorageProviderName,
+  StorageProvider
+} from './providers';
 import {Observable, ReplaySubject} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
+import {checkStorage, addPrefixToKey} from './decorators';
 
 @Injectable()
 export class WebStorageService {
@@ -98,7 +103,7 @@ export class WebStorageService {
   keys(): string[] {
     const keys = [];
 
-    return this.forEach((item: any, key: string) => {keys.push(key)}), keys;
+    return this.forEach((item: any, key: string) => keys.push(key)), keys;
   }
 
   // @checkStorage // basically it uses in this.forEach()
@@ -148,61 +153,6 @@ export class WebStorageService {
   private validateAndSetProvider(providerName: string): Observable<WebStorage> {
     return this.validateProvider(providerName)
       .map(provider => this.setProvider(provider));
-  }
-}
-
-/**
- *
- * @param target
- * @param propertyKey
- * @param descriptor
- * @returns {any}
- */
-function addPrefixToKey<TFunction extends Function>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<TFunction>) {
-  return {
-    value(key: string, ...args: any[]) {
-      return descriptor.value.call(this, this.prefixKey(key), ...args);
-    }
-  }
-}
-
-/**
- * Decorator checks if storage provider is set and emits onError
- * @param defaultValue
- * @returns {(target:Object, propertyKey:(string|symbol), descriptor:TypedPropertyDescriptor<TFunction>)=>any}
- */
-function checkStorage(defaultValue: any = null) {
-  return function <TFunction extends Function|any>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<TFunction>): any {
-    // check if decorator applies to a property with get accessor
-    if (!descriptor.value && descriptor.get) {
-      Object.defineProperty(target, propertyKey, {
-        get: function() {
-          // here `this` refers to `target` object, it's ok if IDE highlights it
-          if (this.storage === null) {
-            this.emitError(WS_ERROR.PROVIDER_NOT_SET);
-
-            return defaultValue;
-          }
-
-          return descriptor.get();
-        },
-        set: descriptor.set,
-        configurable: descriptor.configurable,
-        enumerable: descriptor.enumerable
-      });
-    } else { // decorator applies to function
-      return {
-        value(...args: any[]) {
-          if (this.storage === null) {
-            this.emitError(WS_ERROR.PROVIDER_NOT_SET);
-
-            return defaultValue;
-          }
-
-          return descriptor.value.apply(this, args);
-        }
-      }
-    }
   }
 }
 
