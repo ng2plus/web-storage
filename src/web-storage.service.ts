@@ -1,7 +1,7 @@
 import {Injectable, Inject} from '@angular/core';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
-import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig} from './web-storage.config';
+import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig, WebStorageEvent} from './web-storage.config';
 import {
   LocalStorageProvider,
   localStorageProviderName,
@@ -9,13 +9,16 @@ import {
   sessionStorageProviderName,
   StorageProvider
 } from './providers';
-import {Observable, ReplaySubject} from 'rxjs';
+import {Observable, ReplaySubject, Subject} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
 import {checkStorage, addPrefixToKey} from './decorators';
+import {DefaultWebStorageProvider} from './web-storage-type';
 
 @Injectable()
 export class WebStorageService {
   onError: ReplaySubject<number> = new ReplaySubject<number>(1);
+  onSet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
+  onGet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
 
   private storage: WebStorage = null;
   private providers: {[index: string]: StorageProvider} = {};
@@ -38,7 +41,7 @@ export class WebStorageService {
     this.providers[name] = value;
   }
 
-  useProvider(providerName: string): void {
+  useProvider(providerName: string|DefaultWebStorageProvider): void {
     this.storage = null;
     this.validateAndSetProvider(providerName).subscribe(utils.noop, err => this.emitError(err));
   }
@@ -51,15 +54,27 @@ export class WebStorageService {
   @checkStorage(null)
   @addPrefixToKey
   get<T>(key: string, defaultVal = null): T {
-    let item = this.storage.getItem(key);
+    let item = this.getItem<T>(key, defaultVal);
 
-    return item === null ? defaultVal : item;
+    this.ifNotifyThenDo('get', () => this.onGet.next(this.createEventItem(this.extractKey(key), item)));
+
+    return item;
   }
 
   @checkStorage()
   @addPrefixToKey
   set(key: string, item: any) {
-    this.storage.setItem(key, item);
+    let oldVal;
+
+    try {
+      this.ifNotifyThenDo('set', () => oldVal = this.getItem(this.extractKey(key)));
+
+      this.storage.setItem(key, item);
+
+      this.ifNotifyThenDo('set', () => this.onSet.next(this.createEventItem(this.extractKey(key), item, oldVal)));
+    } catch (e) {
+      this.onError.next(e.message);
+    }
   }
 
   // @checkStorage // basically it uses in this.get()
@@ -115,6 +130,27 @@ export class WebStorageService {
     });
 
     return all;
+  }
+
+  private getItem<T>(prefixedKey: string, defaultVal = null): T {
+    let item = this.storage.getItem(prefixedKey);
+
+    return item === null ? defaultVal : item;
+  }
+
+  private ifNotifyThenDo(optionName: string, action: () => any) {
+    if (this.config.notifyOn[optionName] === true) {
+      action();
+    }
+  }
+
+  private createEventItem(key: string, newValue: any, oldValue: any = null): WebStorageEvent {
+    return {
+      key,
+      newValue,
+      oldValue,
+      storageArea: this.storage
+    }
   }
 
   private emitError(code: number): void {

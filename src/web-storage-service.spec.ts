@@ -1,10 +1,85 @@
 import {WebStorageService} from './web-storage.service';
-import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault} from './web-storage.config';
+import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault, WebStorageEvent} from './web-storage.config';
 import {TestBed, inject, async} from '@angular/core/testing';
-import {ReplaySubject} from 'rxjs';
+import {ReplaySubject, Observable} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
+import {StorageProvider} from './providers/storage-provider';
+import {WebStorage} from './web-storage';
+import {LocalStorageProvider} from './providers/default/local-storage-provider';
 
-describe('WebStorage Service', () => {
+describe('WebStorage Providers', () => {
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      WebStorageService,
+      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
+    ]
+  }));
+
+  it(`should switch between default providers`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+
+      let spies = {
+          onErrorFn() {}
+        };
+
+      spyOn(spies, 'onErrorFn').and.callThrough();
+      storage.onError.subscribe(spies.onErrorFn);
+
+      storage.useProvider('localStorage');
+      storage.useProvider('sessionStorage');
+
+      expect(spies.onErrorFn).toHaveBeenCalledTimes(0);
+    }))
+  );
+
+  it(`should not add duplicate provider`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+
+      let spies = {
+          onErrorFn(val) {
+            expect(val).toBe(WS_ERROR.PROVIDER_EXISTS);
+          }
+        };
+
+      spyOn(spies, 'onErrorFn').and.callThrough();
+      storage.onError.subscribe(spies.onErrorFn);
+
+      storage.addProvider('localStorage', new LocalStorageProvider());
+
+      expect(spies.onErrorFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`should add and use new provider`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+
+      let spies = {
+          onErrorFn() {}
+        };
+
+      spyOn(spies, 'onErrorFn').and.callThrough();
+      storage.onError.subscribe(spies.onErrorFn);
+
+      storage.addProvider('cookie', new (class CookieProvider implements StorageProvider {
+        get(): WebStorage {
+          return <WebStorage>{};
+        }
+
+        validate(): Observable<WebStorage> {
+          return Observable.empty<WebStorage>();
+        }
+      })());
+      storage.useProvider('cookie');
+
+      expect(spies.onErrorFn).toHaveBeenCalledTimes(0);
+    }))
+  );
+});
+
+describe('WebStorage Service Interface', () => {
   let testKey = 'key',
     testKey2 = 'key2',
     testKey3 = 'key3',
@@ -19,9 +94,6 @@ describe('WebStorage Service', () => {
       {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
     ]
   }));
-
-  // storage.addProvider('name', instance);
-  // storage.useProvider('name', useValue);
 
   it(`should be empty`,
     inject([WebStorageService], (storage: WebStorageService) => {
@@ -105,7 +177,7 @@ describe('WebStorage Service', () => {
 
 });
 
-describe('WebStorage Service event', () => {
+describe('WebStorage Service events', () => {
   let testKey = 'key',
     testVal = 'val';
 
@@ -162,5 +234,58 @@ describe('WebStorage Service event', () => {
 
       expect(spies.onErrorFn).toHaveBeenCalledTimes(10);
     }))
+  );
+
+  it(`'onSet' fires`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+
+      let spies = {
+          onSetFn(val: WebStorageEvent) {
+            expect(val.key).toEqual(testKey);
+            expect(val.newValue).toEqual(testVal);
+            expect(val.oldValue).toBeNull();
+            expect(val.storageArea).not.toBeNull();
+          }
+        };
+
+      spyOn(spies, 'onSetFn').and.callThrough();
+
+      storage.onSet.subscribe(spies.onSetFn);
+
+      storage.set(testKey, testVal);
+
+      expect(spies.onSetFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`'onGet' fires`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+
+      let spies = {
+          onGetFn(val: WebStorageEvent) {
+            expect(val.key).toEqual(testKey);
+            expect(val.newValue).toEqual(testVal);
+            expect(val.oldValue).toBeNull();
+            expect(val.storageArea).not.toBeNull();
+          }
+        };
+
+      spyOn(spies, 'onGetFn').and.callThrough();
+
+      storage.onGet.subscribe(spies.onGetFn);
+
+      storage.set(testKey, testVal);
+      storage.get(testKey);
+
+      expect(spies.onGetFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`(service) should remove all items`,
+    inject([WebStorageService], (storage: WebStorageService) => {
+      storage.removeAll();
+    })
   );
 });

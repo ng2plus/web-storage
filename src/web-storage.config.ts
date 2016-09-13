@@ -1,5 +1,6 @@
 import {DefaultWebStorageProvider} from './web-storage-type';
 import { OpaqueToken } from '@angular/core';
+import {WebStorage} from './web-storage';
 
 export const WEB_STORAGE_SERVICE_CONFIG = new OpaqueToken('WEB_STORAGE_SERVICE_CONFIG');
 
@@ -14,8 +15,7 @@ export const webStorageConfigDefault: WebStorageConfig = {
     remove: true,
     update: false,
     removeAll: false
-  },
-  storeMetaData: true
+  }
 };
 
 // ############ INTERFACES ############
@@ -26,7 +26,6 @@ export interface WebStorageConfig {
   prefix?: string,
   provider?: DefaultWebStorageProvider/* | 'localForage'*/,
   notifyOn?: NotifyOptions, // emit change, update, add, etc. events
-  storeMetaData?: boolean // to use features like deleteAll(prefix (default is what in config))
 }
 
 export interface NotifyOptions {
@@ -35,4 +34,11 @@ export interface NotifyOptions {
   remove?: boolean,
   update?: boolean,
   removeAll?: boolean
+}
+
+export interface WebStorageEvent {
+  key?: string;
+  oldValue?: string;
+  newValue?: string;
+  storageArea?: WebStorage;
 }
