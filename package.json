@@ -1,5 +1,5 @@
 {
-  "name": "ng2-web-storage",
+  "name": "@ng2plus/ng2-web-storage",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
@@ -12,11 +12,11 @@
     "preversion": "npm test"
   },
   "devDependencies": {
-    "@angular/common": "^2.0.0-rc.6",
-    "@angular/compiler": "^2.0.0-rc.6",
-    "@angular/core": "^2.0.0-rc.6",
-    "@angular/platform-browser": "^2.0.0-rc.6",
-    "@angular/platform-browser-dynamic": "^2.0.0-rc.6",
+    "@angular/common": "^2.0.0-rc.7",
+    "@angular/compiler": "^2.0.0-rc.7",
+    "@angular/core": "^2.0.0-rc.7",
+    "@angular/platform-browser": "^2.0.0-rc.7",
+    "@angular/platform-browser-dynamic": "^2.0.0-rc.7",
     "@types/core-js": "^0.9.32",
     "@types/jasmine": "^2.2.33",
     "@types/node": "^6.0.38",
@@ -31,11 +31,11 @@
     "karma-jasmine": "^1.0.2",
     "karma-mocha-reporter": "^2.1.0",
     "karma-webpack": "1.8.0",
-    "rxjs": "5.0.0-beta.11",
+    "rxjs": "5.0.0-beta.12",
     "ts-helpers": "1.1.1",
     "typescript": "2.0.2",
     "webpack": "^2.1.0-beta.21",
-    "zone.js": "^0.6.17"
+    "zone.js": "0.6.21"
   },
   "peerDependencies": {
     "@angular/core": "^2.0.0-rc.6"
