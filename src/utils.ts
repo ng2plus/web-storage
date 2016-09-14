@@ -16,5 +16,13 @@ export const utils = {
 
     return merged;
   },
-  noop() {}
+  noop() {},
+  /**
+   * Makes a dictionary of "key:value" pairs without prototype
+   * @param obj
+   * @returns {T&U}
+   */
+  dictionary<T extends Object>(...obj: T[]): T {
+    return Object.assign(Object.create(null), ...obj);
+  }
 };
