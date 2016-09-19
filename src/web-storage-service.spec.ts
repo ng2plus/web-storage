@@ -86,7 +86,9 @@ describe('WebStorage Service Interface', () => {
     testVal = 'val',
     testVal2 = 'val2',
     testVal3 = 'val3',
-    overrideVal = 'oVal';
+    overrideVal = 'oVal',
+    testObjKey = 'valO',
+    testObjVal = {a: 'test'};
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -94,6 +96,10 @@ describe('WebStorage Service Interface', () => {
       {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
     ]
   }));
+
+  // afterEach(() => inject([WebStorageService], (storage: WebStorageService) => {
+  //   storage.removeAll();
+  // }));
 
   it(`should be empty`,
     inject([WebStorageService], (storage: WebStorageService) => {
@@ -114,8 +120,14 @@ describe('WebStorage Service Interface', () => {
       // set single value
       storage.set(testKey, testVal);
 
+      // set object
+      storage.set(testObjKey, testObjVal);
+
       expect(storage.set).toHaveBeenCalled();
       expect(storage.get(testKey)).toBe(testVal);
+      expect(storage.get(testObjKey)).toEqual(testObjVal);
+
+      storage.remove(testObjKey);
     })
   ));
 

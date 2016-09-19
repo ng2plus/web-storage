@@ -13,8 +13,8 @@ export const NOTIFY_OPTION = {
 export const WEB_STORAGE_SERVICE_CONFIG = new OpaqueToken('WEB_STORAGE_SERVICE_CONFIG');
 
 export const webStorageConfigDefault: WebStorageConfig = utils.dictionary<WebStorageConfig>({
-  // deserializeObjects: true,
-  // deserializeNumberLikeStrings: true,
+  // deserializeObjects: true, // if someone needs this, open an issue
+  // deserializeNumberLikeStrings: true, // if someone needs this, open an issue
   prefix: '__',
   provider: 'localStorage',
   notifyOn: {

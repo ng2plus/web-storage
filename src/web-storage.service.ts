@@ -14,6 +14,7 @@ import {WS_ERROR} from './web-storage.messages';
 import {checkStorage, addPrefixToKey} from './decorators';
 import {DefaultWebStorageProvider} from './web-storage-type';
 import {NOTIFY_OPTION} from './web-storage.config';
+import {KeyValIterator} from './utils';
 
 @Injectable()
 export class WebStorageService {
@@ -56,7 +57,7 @@ export class WebStorageService {
 
   @checkStorage(null)
   @addPrefixToKey
-  get<T>(key: string, defaultVal = null): T {
+  get<T>(key: string, defaultVal: any|KeyValIterator<any> = null): T {
     let item = this.getItem<T>(key, defaultVal);
 
     this.ifNotifyThenEmit(NOTIFY_OPTION.GET, this.makeEventItem(key, item));
@@ -66,13 +67,13 @@ export class WebStorageService {
 
   @checkStorage()
   @addPrefixToKey
-  set(key: string, item: any) {
+  set(key: string, item: any, replacer?: KeyValIterator<any>) {
     let oldVal;
 
     try {
       this.ifNotifyThenDo(NOTIFY_OPTION.SET, () => oldVal = this.getItem(this.extractKey(key)));
 
-      this.storage.setItem(key, item);
+      this.storage.setItem(key, JSON.stringify(item, replacer));
 
       this.ifNotifyThenEmit(NOTIFY_OPTION.SET, this.makeEventItem(key, item, oldVal));
     } catch (e) {
@@ -143,8 +144,14 @@ export class WebStorageService {
     return all;
   }
 
-  private getItem<T>(prefixedKey: string, defaultVal = null): T {
-    let item = this.storage.getItem(prefixedKey);
+  private getItem<T>(prefixedKey: string, defaultVal: any|KeyValIterator<any> = null): T {
+    let parseBound = JSON.parse.bind(JSON, this.storage.getItem(prefixedKey));
+
+    if (typeof defaultVal === 'function') {
+      return parseBound(defaultVal);
+    }
+
+    const item = parseBound();
 
     return item === null ? defaultVal : item;
   }

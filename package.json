@@ -1,6 +1,6 @@
 {
   "name": "@ng2plus/ng2-web-storage",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "main": "index.js",
   "scripts": {
     "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"index.+(js|d.ts|js.map)\"",

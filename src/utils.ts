@@ -33,3 +33,7 @@ export const utils = {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
 };
+
+export interface KeyValIterator<T> {
+  (key: string, value: T): any
+}
