@@ -1,6 +1,5 @@
 import {DefaultWebStorageProvider} from './web-storage-type';
 import {OpaqueToken} from '@angular/core';
-import {WebStorage} from './web-storage';
 import {utils} from './utils';
 
 export const NOTIFY_OPTION = {
@@ -31,7 +30,7 @@ export interface WebStorageConfig {
   deserializeObjects?: boolean,
   deserializeNumberLikeStrings?: boolean,
   prefix?: string,
-  provider?: DefaultWebStorageProvider,
+  provider?: DefaultWebStorageProvider|string,
   notifyOn?: NotifyOptions, // emit change, update, add, etc. events
 }
 
@@ -44,7 +43,8 @@ export interface NotifyOptions {
 }
 
 export interface WebStorageEvent extends WebStorageEventItem {
-  storageArea?: WebStorage;
+  url?: string;
+  provider?: string;
 }
 
 export interface WebStorageEventItem {

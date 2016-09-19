@@ -1,5 +1,5 @@
 import {WebStorageService} from './web-storage.service';
-import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault, WebStorageEvent} from './web-storage.config';
+import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault, WebStorageEventItem, WebStorageEvent} from './web-storage.config';
 import {TestBed, inject, async} from '@angular/core/testing';
 import {ReplaySubject, Observable, Subject} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
@@ -259,11 +259,10 @@ describe('WebStorage Service event', () => {
       expect(storage.onSet).toEqual(jasmine.any(Subject));
 
       let spies = {
-          onSetFn(val: WebStorageEvent) {
+          onSetFn(val: WebStorageEventItem) {
             expect(val.key).toEqual(testKey);
             expect(val.newValue).toEqual(testVal);
             expect(val.oldValue).toBeNull();
-            expect(val.storageArea).not.toBeNull();
           }
         };
 
@@ -282,11 +281,10 @@ describe('WebStorage Service event', () => {
       expect(storage.onGet).toEqual(jasmine.any(Subject));
 
       let spies = {
-          onGetFn(val: WebStorageEvent) {
+          onGetFn(val: WebStorageEventItem) {
             expect(val.key).toEqual(testKey);
             expect(val.newValue).toEqual(testVal);
             expect(val.oldValue).toBeNull();
-            expect(val.storageArea).not.toBeNull();
           }
         };
 
@@ -306,11 +304,10 @@ describe('WebStorage Service event', () => {
       expect(storage.onRemove).toEqual(jasmine.any(Subject));
 
       let spies = {
-          subscribeFn(val: WebStorageEvent) {
+          subscribeFn(val: WebStorageEventItem) {
             expect(val.key).toEqual(testKey);
             expect(val.newValue).toBeNull();
             expect(val.oldValue).toEqual(testVal);
-            expect(val.storageArea).not.toBeNull();
           }
         };
 
@@ -328,17 +325,15 @@ describe('WebStorage Service event', () => {
   it(`'onGet' and 'onRemove' fires`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
       let spies = {
-          onGetFn(val: WebStorageEvent) {
+          onGetFn(val: WebStorageEventItem) {
             expect(val.key).toEqual(testKey);
             expect(val.newValue).toEqual(testVal);
             expect(val.oldValue).toBeNull();
-            expect(val.storageArea).not.toBeNull();
           },
-          onRemoveFn(val: WebStorageEvent) {
+          onRemoveFn(val: WebStorageEventItem) {
             expect(val.key).toEqual(testKey);
             expect(val.newValue).toBeNull();
             expect(val.oldValue).toEqual(testVal);
-            expect(val.storageArea).not.toBeNull();
           }
         };
 
@@ -377,6 +372,12 @@ describe('WebStorage Service event', () => {
       expect(spies.subscribeFn).toHaveBeenCalledTimes(1);
     }))
   );
+
+  if ('BroadcastChannel' in window) {
+    xit(`BroadcastChannel.postMessage`, () => {
+      // TODO how?
+    });
+  }
 
   it(`(service) should remove all items`,
     inject([WebStorageService], (storage: WebStorageService) => {

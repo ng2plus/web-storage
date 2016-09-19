@@ -16,13 +16,17 @@ import {DefaultWebStorageProvider} from './web-storage-type';
 import {NOTIFY_OPTION} from './web-storage.config';
 import {KeyValIterator} from './utils';
 
+declare const BroadcastChannel;
+
 @Injectable()
 export class WebStorageService {
   onError: ReplaySubject<number> = new ReplaySubject<number>(1);
-  onSet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
-  onGet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
-  onRemove: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
+  onSet: Subject<WebStorageEventItem> = new Subject<WebStorageEventItem>();
+  onGet: Subject<WebStorageEventItem> = new Subject<WebStorageEventItem>();
+  onRemove: Subject<WebStorageEventItem> = new Subject<WebStorageEventItem>();
   onRemoveAll: Subject<number> = new Subject<number>();
+  onMessage: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
+  channel: any = null;
 
   private storage: WebStorage = null;
   private providers: {[index: string]: StorageProvider} = {};
@@ -181,20 +185,27 @@ export class WebStorageService {
   private ifNotifyThenEmit(optionName: string, {key, newValue, oldValue}: WebStorageEventItem) {
     if (this.config.notifyOn[optionName] === true) {
       const fnName = `on${utils.capitalize(optionName)}`;
-      const subjectFn: Subject<WebStorageEvent> = this[fnName];
+      const subjectFn: Subject<WebStorageEventItem> = this[fnName];
 
       if (!subjectFn) {
         return console.warn(`[Internal error]: method ${fnName} not found`);
       }
 
-      subjectFn.next(this.createEventItem(this.extractKey(key), newValue, oldValue))
+      const eventItem = this.createEventItem(this.extractKey(key), newValue, oldValue);
+
+      subjectFn.next(eventItem);
+
+      if (this.channel && [NOTIFY_OPTION.SET, NOTIFY_OPTION.REMOVE, NOTIFY_OPTION.REMOVE_ALL].includes(optionName)) {
+        this.channel.postMessage(<WebStorageEvent>Object.assign(eventItem, {
+          url: location.href,
+          provider: this.config.provider
+        }));
+      }
     }
   }
 
-  private createEventItem(key: string, newVal: any, oldVal: any = null): WebStorageEvent {
-    return Object.assign(this.makeEventItem(key, newVal, oldVal), {
-      storageArea: this.storage
-    });
+  private createEventItem(key: string, newVal: any, oldVal: any = null): WebStorageEventItem {
+    return this.makeEventItem(key, newVal, oldVal);
   }
 
   private emitError(code: number): void {
@@ -202,7 +213,22 @@ export class WebStorageService {
   }
 
   private init(): void {
+    this.initBroadcast();
     this.useProvider(this.config.provider);
+  }
+
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API
+   */
+  private initBroadcast() {
+    if ('BroadcastChannel' in window) {
+      const channelName = `ng2plus:webstorage:${this.config.provider}`;
+
+      this.channel = new BroadcastChannel(channelName);
+      this.channel.onmessage = (event: {data: WebStorageEvent}) => {
+        this.onMessage.next(event.data);
+      }
+    }
   }
 
   private addDefaultProviders() {
