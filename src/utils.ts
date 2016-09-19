@@ -16,7 +16,6 @@ export const utils = {
 
     return merged;
   },
-  noop() {},
   /**
    * Makes a dictionary of "key:value" pairs without prototype
    * @param obj
@@ -24,5 +23,13 @@ export const utils = {
    */
   dictionary<T extends Object>(...obj: T[]): T {
     return Object.assign(Object.create(null), ...obj);
+  },
+  /**
+   * Capitalizes first letter
+   * @param string
+   * @returns {string}
+   */
+  capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
   }
 };

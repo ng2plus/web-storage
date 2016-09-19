@@ -1,7 +1,7 @@
 import {WebStorageService} from './web-storage.service';
 import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault, WebStorageEvent} from './web-storage.config';
 import {TestBed, inject, async} from '@angular/core/testing';
-import {ReplaySubject, Observable} from 'rxjs';
+import {ReplaySubject, Observable, Subject} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
 import {StorageProvider} from './providers/storage-provider';
 import {WebStorage} from './web-storage';
@@ -177,9 +177,11 @@ describe('WebStorage Service Interface', () => {
 
 });
 
-describe('WebStorage Service events', () => {
+describe('WebStorage Service event', () => {
   let testKey = 'key',
-    testVal = 'val';
+    testVal = 'val',
+    testKey2 = 'key2',
+    testVal2 = 'val2';
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -223,7 +225,7 @@ describe('WebStorage Service events', () => {
       // #2
       current = ACTION.USE_API_WHEN_PROVIDER_NOT_SET;
       storage.set(testKey, testVal);
-      storage.length;
+      void storage.length;
       storage.get(testKey);
       storage.has(testKey);
       storage.remove(testKey);
@@ -238,7 +240,7 @@ describe('WebStorage Service events', () => {
 
   it(`'onSet' fires`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
-      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+      expect(storage.onSet).toEqual(jasmine.any(Subject));
 
       let spies = {
           onSetFn(val: WebStorageEvent) {
@@ -261,7 +263,7 @@ describe('WebStorage Service events', () => {
 
   it(`'onGet' fires`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
-      expect(storage.onError).toEqual(jasmine.any(ReplaySubject));
+      expect(storage.onGet).toEqual(jasmine.any(Subject));
 
       let spies = {
           onGetFn(val: WebStorageEvent) {
@@ -280,6 +282,52 @@ describe('WebStorage Service events', () => {
       storage.get(testKey);
 
       expect(spies.onGetFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`'onRemove' fires`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onRemove).toEqual(jasmine.any(Subject));
+
+      let spies = {
+          subscribeFn(val: WebStorageEvent) {
+            expect(val.key).toEqual(testKey);
+            expect(val.newValue).toBeNull();
+            expect(val.oldValue).toEqual(testVal);
+            expect(val.storageArea).not.toBeNull();
+          }
+        };
+
+      spyOn(spies, 'subscribeFn').and.callThrough();
+
+      storage.onRemove.subscribe(spies.subscribeFn);
+
+      storage.set(testKey, testVal);
+      storage.remove(testKey);
+
+      expect(spies.subscribeFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`'onRemoveAll' fires`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      expect(storage.onRemoveAll).toEqual(jasmine.any(Subject));
+
+      let spies = {
+          subscribeFn(val: number) {
+            expect(val).toEqual(2);
+          }
+        };
+
+      spyOn(spies, 'subscribeFn').and.callThrough();
+
+      storage.onRemoveAll.subscribe(spies.subscribeFn);
+
+      storage.set(testKey, testVal);
+      storage.set(testKey2, testVal2);
+      storage.removeAll();
+
+      expect(spies.subscribeFn).toHaveBeenCalledTimes(1);
     }))
   );
 

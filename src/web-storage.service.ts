@@ -1,7 +1,7 @@
 import {Injectable, Inject} from '@angular/core';
 import {utils} from './utils';
 import {WebStorage} from './web-storage';
-import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig, WebStorageEvent} from './web-storage.config';
+import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig, WebStorageEvent, WebStorageEventItem} from './web-storage.config';
 import {
   LocalStorageProvider,
   localStorageProviderName,
@@ -13,12 +13,15 @@ import {Observable, ReplaySubject, Subject} from 'rxjs';
 import {WS_ERROR} from './web-storage.messages';
 import {checkStorage, addPrefixToKey} from './decorators';
 import {DefaultWebStorageProvider} from './web-storage-type';
+import {NOTIFY_OPTION} from './web-storage.config';
 
 @Injectable()
 export class WebStorageService {
   onError: ReplaySubject<number> = new ReplaySubject<number>(1);
   onSet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
   onGet: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
+  onRemove: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
+  onRemoveAll: Subject<number> = new Subject<number>();
 
   private storage: WebStorage = null;
   private providers: {[index: string]: StorageProvider} = {};
@@ -43,7 +46,7 @@ export class WebStorageService {
 
   useProvider(providerName: string|DefaultWebStorageProvider): void {
     this.storage = null;
-    this.validateAndSetProvider(providerName).subscribe(utils.noop, err => this.emitError(err));
+    this.validateAndSetProvider(providerName).subscribe(<any>Function.prototype, err => this.emitError(err));
   }
 
   setup(config: WebStorageConfig) {
@@ -56,7 +59,7 @@ export class WebStorageService {
   get<T>(key: string, defaultVal = null): T {
     let item = this.getItem<T>(key, defaultVal);
 
-    this.ifNotifyThenDo('get', () => this.onGet.next(this.createEventItem(this.extractKey(key), item)));
+    this.ifNotifyThenEmit(NOTIFY_OPTION.GET, this.makeEventItem(key, item));
 
     return item;
   }
@@ -67,11 +70,11 @@ export class WebStorageService {
     let oldVal;
 
     try {
-      this.ifNotifyThenDo('set', () => oldVal = this.getItem(this.extractKey(key)));
+      this.ifNotifyThenDo(NOTIFY_OPTION.SET, () => oldVal = this.getItem(this.extractKey(key)));
 
       this.storage.setItem(key, item);
 
-      this.ifNotifyThenDo('set', () => this.onSet.next(this.createEventItem(this.extractKey(key), item, oldVal)));
+      this.ifNotifyThenEmit(NOTIFY_OPTION.SET, this.makeEventItem(key, item, oldVal));
     } catch (e) {
       this.onError.next(e.message);
     }
@@ -88,13 +91,21 @@ export class WebStorageService {
     let removed = this.get<T>(this.extractKey(key));
 
     this.storage.removeItem(key);
+    this.ifNotifyThenEmit(NOTIFY_OPTION.REMOVE, this.makeEventItem(key, null, removed));
 
     return removed;
   }
 
   // @checkStorage // basically it uses in this.forEach()
   removeAll(): void {
-    this.forEach((item: any, key: string) => this.remove(key));
+    try {
+      let count = 0;
+      this.forEach((item: any, key: string) => this.remove(key) && ++count);
+
+      this.ifNotifyThenDo(NOTIFY_OPTION.REMOVE_ALL, () => this.onRemoveAll.next(count));
+    } catch(e) {
+      this.onError.next(e.message);
+    }
   }
 
   /**
@@ -144,13 +155,27 @@ export class WebStorageService {
     }
   }
 
-  private createEventItem(key: string, newValue: any, oldValue: any = null): WebStorageEvent {
-    return {
-      key,
-      newValue,
-      oldValue,
-      storageArea: this.storage
+  private makeEventItem(key: string, newValue: any, oldValue?: any): WebStorageEventItem {
+    return {key, newValue, oldValue};
+  }
+
+  private ifNotifyThenEmit(optionName: string, {key, newValue, oldValue}: WebStorageEventItem) {
+    if (this.config.notifyOn[optionName] === true) {
+      const fnName = `on${utils.capitalize(optionName)}`;
+      const subjectFn: Subject<WebStorageEvent> = this[fnName];
+
+      if (!subjectFn) {
+        return console.warn(`[Internal error]: method ${fnName} not found`);
+      }
+
+      subjectFn.next(this.createEventItem(this.extractKey(key), newValue, oldValue))
     }
+  }
+
+  private createEventItem(key: string, newVal: any, oldVal: any = null): WebStorageEvent {
+    return Object.assign(this.makeEventItem(key, newVal, oldVal), {
+      storageArea: this.storage
+    });
   }
 
   private emitError(code: number): void {

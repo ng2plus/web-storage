@@ -3,19 +3,25 @@ import {OpaqueToken} from '@angular/core';
 import {WebStorage} from './web-storage';
 import {utils} from './utils';
 
+export const NOTIFY_OPTION = {
+  SET: 'set',
+  GET: 'get',
+  REMOVE: 'remove',
+  REMOVE_ALL: 'removeAll'
+};
+
 export const WEB_STORAGE_SERVICE_CONFIG = new OpaqueToken('WEB_STORAGE_SERVICE_CONFIG');
 
 export const webStorageConfigDefault: WebStorageConfig = utils.dictionary<WebStorageConfig>({
-  deserializeObjects: true,
-  deserializeNumberLikeStrings: true,
+  // deserializeObjects: true,
+  // deserializeNumberLikeStrings: true,
   prefix: '__',
   provider: 'localStorage',
   notifyOn: {
-    set: true,
-    get: true,
-    remove: true,
-    update: false,
-    removeAll: false
+    [NOTIFY_OPTION.SET]: true,
+    [NOTIFY_OPTION.GET]: true,
+    [NOTIFY_OPTION.REMOVE]: true,
+    [NOTIFY_OPTION.REMOVE_ALL]: true
   }
 });
 
@@ -37,9 +43,12 @@ export interface NotifyOptions {
   removeAll?: boolean
 }
 
-export interface WebStorageEvent {
-  key?: string;
-  oldValue?: string;
-  newValue?: string;
+export interface WebStorageEvent extends WebStorageEventItem {
   storageArea?: WebStorage;
+}
+
+export interface WebStorageEventItem {
+    key?: string;
+    oldValue?: string;
+    newValue?: string;
 }
