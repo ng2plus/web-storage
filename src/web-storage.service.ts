@@ -81,6 +81,18 @@ export class WebStorageService {
     }
   }
 
+  @checkStorage(null)
+  @addPrefixToKey
+  pull<T>(key: string, defaultVal: any|KeyValIterator<any> = null): T {
+    let item = this.getItem<T>(key, defaultVal);
+
+    this.remove(this.extractKey(key));
+
+    this.ifNotifyThenEmit(NOTIFY_OPTION.GET, this.makeEventItem(key, item));
+
+    return item;
+  }
+
   // @checkStorage // basically it uses in this.get()
   has(key: string): boolean {
     return this.get(key) !== null;
@@ -89,7 +101,7 @@ export class WebStorageService {
   @checkStorage() // despite it uses this.get we still need to check storage
   @addPrefixToKey
   remove<T>(key: string): T {
-    let removed = this.get<T>(this.extractKey(key));
+    let removed = this.getItem<T>(key);
 
     this.storage.removeItem(key);
     this.ifNotifyThenEmit(NOTIFY_OPTION.REMOVE, this.makeEventItem(key, null, removed));

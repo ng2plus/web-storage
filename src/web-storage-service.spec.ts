@@ -145,9 +145,13 @@ describe('WebStorage Service Interface', () => {
     inject([WebStorageService], (storage: WebStorageService) => {
       storage.set(testKey, testVal);
       storage.set(testKey2, testVal2);
+      storage.set(testObjKey, testObjVal);
 
       // get single value
       expect(storage.get(testKey)).toBe(testVal);
+
+      // pull value (and remove)
+      expect(storage.pull(testObjKey)).toEqual(testObjVal);
 
       // get all items
       expect(storage.getAll()).toEqual({
@@ -318,6 +322,37 @@ describe('WebStorage Service event', () => {
       storage.remove(testKey);
 
       expect(spies.subscribeFn).toHaveBeenCalledTimes(1);
+    }))
+  );
+
+  it(`'onGet' and 'onRemove' fires`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      let spies = {
+          onGetFn(val: WebStorageEvent) {
+            expect(val.key).toEqual(testKey);
+            expect(val.newValue).toEqual(testVal);
+            expect(val.oldValue).toBeNull();
+            expect(val.storageArea).not.toBeNull();
+          },
+          onRemoveFn(val: WebStorageEvent) {
+            expect(val.key).toEqual(testKey);
+            expect(val.newValue).toBeNull();
+            expect(val.oldValue).toEqual(testVal);
+            expect(val.storageArea).not.toBeNull();
+          }
+        };
+
+      spyOn(spies, 'onGetFn').and.callThrough();
+      spyOn(spies, 'onRemoveFn').and.callThrough();
+
+      storage.onGet.subscribe(spies.onGetFn);
+      storage.onRemove.subscribe(spies.onRemoveFn);
+
+      storage.set(testKey, testVal);
+      storage.pull(testKey);
+
+      expect(spies.onGetFn).toHaveBeenCalledTimes(1);
+      expect(spies.onRemoveFn).toHaveBeenCalledTimes(1);
     }))
   );
 
