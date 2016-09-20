@@ -9,6 +9,7 @@ const helpers = require('./helpers');
  */
 const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
+const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 
 /**
  * Webpack Constants
@@ -200,7 +201,11 @@ module.exports = {
       }
     }),
 
-
+    // https://github.com/AngularClass/angular2-webpack-starter/issues/993#issuecomment-246883410
+    new ContextReplacementPlugin(
+      /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
+      __dirname
+    ),
   ],
 
   /**
