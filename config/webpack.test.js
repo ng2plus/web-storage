@@ -10,6 +10,7 @@ const helpers = require('./helpers');
 const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
+const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 
 /**
  * Webpack Constants
@@ -43,12 +44,7 @@ module.exports = {
      *
      * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
      */
-    extensions: ['', '.ts', '.js'],
-
-    /**
-     * Make sure root is src
-     */
-    root: helpers.root('src'),
+    extensions: ['.ts', '.js'] // configuration.resolve.extensions[0] should not be empty
 
   },
 
@@ -58,20 +54,23 @@ module.exports = {
    * See: http://webpack.github.io/docs/configuration.html#module
    */
   module: {
-
     /**
-     * An array of applied pre and post loaders.
+     * An array of automatically applied loaders.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
+     * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
+     * This means they are not resolved relative to the configuration file.
+     *
+     * See: http://webpack.github.io/docs/configuration.html#module-loaders
      */
-    preLoaders: [
+    loaders: [
 
       /**
        * Tslint loader support for *.ts files
        *
        * See: https://github.com/wbuchwalter/tslint-loader
        */
-/*      {
+      /*{
+        enforce: "right",
         test: /\.ts$/,
         loader: 'tslint-loader',
         exclude: [helpers.root('node_modules')]
@@ -83,26 +82,15 @@ module.exports = {
        *
        * See: https://github.com/webpack/source-map-loader
        */
-/*      {
+      /*{
+        enforce: "right",
         test: /\.js$/,
         loader: 'source-map-loader',
         exclude: [
         // these packages have problems with their sourcemaps
         helpers.root('node_modules/rxjs'),
         helpers.root('node_modules/@angular')
-      ]}*/
-
-    ],
-
-    /**
-     * An array of automatically applied loaders.
-     *
-     * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
-     * This means they are not resolved relative to the configuration file.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-loaders
-     */
-    loaders: [
+      ]},*/
 
       /**
        * Typescript loader support for .ts and Angular 2 async routes via .async.ts
@@ -122,7 +110,7 @@ module.exports = {
           }
         },
         exclude: [/\.e2e\.ts$/]
-      },
+      }
 
 /*      /!**
        * Json loader support for *.json files.
@@ -147,15 +135,6 @@ module.exports = {
        *!/
       { test: /\.html$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] }*/
 
-    ],
-
-    /**
-     * An array of applied pre and post loaders.
-     *
-     * See: http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders
-     */
-    postLoaders: [
-
       /**
        * Instruments JS files with Istanbul for subsequent code coverage reporting.
        * Instrument only testing sources.
@@ -163,6 +142,7 @@ module.exports = {
        * See: https://github.com/deepsweet/istanbul-instrumenter-loader
        */
       /*{
+        enforce: "left",
         test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
         include: helpers.root('src'),
         exclude: [
@@ -170,7 +150,6 @@ module.exports = {
           /node_modules/
         ]
       }*/
-
     ]
   },
 
@@ -206,19 +185,23 @@ module.exports = {
       /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
       __dirname
     ),
-  ],
 
-  /**
-   * Static analysis linter for TypeScript advanced options configuration
-   * Description: An extensible linter for the TypeScript language.
-   *
-   * See: https://github.com/wbuchwalter/tslint-loader
-   */
-  tslint: {
-    emitErrors: false,
-    failOnHint: false,
-    resourcePath: 'src'
-  },
+    new LoaderOptionsPlugin({
+      options: {
+        /**
+         * Static analysis linter for TypeScript advanced options configuration
+         * Description: An extensible linter for the TypeScript language.
+         *
+         * See: https://github.com/wbuchwalter/tslint-loader
+         */
+        tslint: {
+          emitErrors: false,
+          failOnHint: false,
+          resourcePath: 'src'
+        }
+      }
+    })
+  ],
 
   /**
    * Include polyfills or mocks for various node stuff
@@ -227,7 +210,7 @@ module.exports = {
    * See: https://webpack.github.io/docs/configuration.html#node
    */
   node: {
-    global: 'window',
+    global: true,
     process: false,
     crypto: 'empty',
     module: false,
