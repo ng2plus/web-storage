@@ -1,10 +1,14 @@
-import {WebStorageService} from './web-storage.service';
-import {WEB_STORAGE_SERVICE_CONFIG, webStorageConfigDefault, WebStorageEventItem, WebStorageEvent} from './web-storage.config';
 import {TestBed, inject, async} from '@angular/core/testing';
 import {ReplaySubject, Observable, Subject} from 'rxjs';
-import {WS_ERROR} from './web-storage.messages';
-import {StorageProvider} from './providers/storage-provider';
-import {WebStorage} from './web-storage';
+import {
+  WS_ERROR,
+  WebStorage,
+  StorageProvider,
+  WEB_STORAGE_SERVICE_CONFIG,
+  webStorageConfigDefault,
+  WebStorageEventItem,
+  WebStorageService
+} from '../index';
 import {LocalStorageProvider} from './providers/default/local-storage-provider';
 
 describe('WebStorage Providers', () => {

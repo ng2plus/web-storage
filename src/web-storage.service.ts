@@ -26,8 +26,8 @@ export class WebStorageService {
   onRemove: Subject<WebStorageEventItem> = new Subject<WebStorageEventItem>();
   onRemoveAll: Subject<number> = new Subject<number>();
   onMessage: Subject<WebStorageEvent> = new Subject<WebStorageEvent>();
-  channel: any = null;
 
+  private channel: any = null;
   private storage: WebStorage = null;
   private providers: {[index: string]: StorageProvider} = {};
 
@@ -41,22 +41,30 @@ export class WebStorageService {
     return this.keys().length;
   }
 
-  addProvider(name: string, value: StorageProvider) {
+  addProvider(name: string, value: StorageProvider, useIt = false): WebStorageService {
     if (this.providers[name]) {
-      return this.emitError(WS_ERROR.PROVIDER_EXISTS);
+      return this.emitError(WS_ERROR.PROVIDER_EXISTS), this;
     }
 
     this.providers[name] = value;
+
+    if (useIt) this.useProvider(name);
+
+    return this;
   }
 
-  useProvider(providerName: string|DefaultWebStorageProvider): void {
+  useProvider(providerName: string|DefaultWebStorageProvider): WebStorageService {
     this.storage = null;
     this.validateAndSetProvider(providerName).subscribe(<any>Function.prototype, err => this.emitError(err));
+
+    return this;
   }
 
-  setup(config: WebStorageConfig) {
+  setup(config: WebStorageConfig): WebStorageService {
     this.config = utils.merge(this.config, config);
     this.init();
+
+    return this;
   }
 
   @checkStorage(null)
@@ -71,7 +79,7 @@ export class WebStorageService {
 
   @checkStorage()
   @addPrefixToKey
-  set(key: string, item: any, replacer?: KeyValIterator<any>) {
+  set(key: string, item: any, replacer?: KeyValIterator<any>): WebStorageService {
     let oldVal;
 
     try {
@@ -83,6 +91,8 @@ export class WebStorageService {
     } catch (e) {
       this.onError.next(e.message);
     }
+
+    return this;
   }
 
   @checkStorage(null)
@@ -102,7 +112,7 @@ export class WebStorageService {
     return this.get(key) !== null;
   }
 
-  @checkStorage() // despite it uses this.get we still need to check storage
+  @checkStorage()
   @addPrefixToKey
   remove<T>(key: string): T {
     let removed = this.getItem<T>(key);
@@ -114,7 +124,7 @@ export class WebStorageService {
   }
 
   // @checkStorage // basically it uses in this.forEach()
-  removeAll(): void {
+  removeAll(): WebStorageService {
     try {
       let count = 0;
       this.forEach((item: any, key: string) => this.remove(key) && ++count);
@@ -123,6 +133,8 @@ export class WebStorageService {
     } catch(e) {
       this.onError.next(e.message);
     }
+
+    return this;
   }
 
   /**
@@ -131,7 +143,7 @@ export class WebStorageService {
    * @param defaultVal
    */
   @checkStorage()
-  forEach(fn: (item: any, key: string) => void, defaultVal: any = null): void {
+  forEach(fn: (item: any, key: string) => void, defaultVal: any = null): WebStorageService {
     let keyStr;
 
     for (let key in this.storage) {
@@ -140,6 +152,8 @@ export class WebStorageService {
         fn(this.get(keyStr, defaultVal), keyStr);
       }
     }
+
+    return this;
   }
 
   // @checkStorage // basically it uses in this.forEach()
