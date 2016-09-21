@@ -212,7 +212,7 @@ module.exports = {
   node: {
     global: true,
     process: false,
-    crypto: 'empty',
+    crypto: false,
     module: false,
     clearImmediate: false,
     setImmediate: false

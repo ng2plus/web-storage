@@ -85,7 +85,65 @@ describe('WebStorage Providers', () => {
   );
 });
 
-describe('WebStorage Service Interface', () => {
+describe('WebStorage as promises', () => {
+  let testKey = 'key';
+  let testKey2 = 'key2';
+  let testVal = 'val';
+  let testVal2 = 'val2';
+
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      WebStorageService,
+      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
+    ]
+  }));
+
+  it(`Should be use in promise chain`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      Promise.resolve(testVal)
+        // async set
+        .then(storage.asPromise.set(testKey))
+        .then(result => expect(result).toEqual(testVal))
+
+        // async pull
+        .then(storage.asPromise.pull(testKey))
+        .then(result => expect(result).toEqual(testVal))
+
+        // (chore)
+        .then(() => testVal)
+        .then(storage.asPromise.set(testKey))
+        .then(result => expect(result).toEqual(testVal))
+
+        // async get
+        .then(storage.asPromise.get(testKey))
+        .then(result => expect(result).toEqual(testVal))
+
+        // async remove
+        .then(storage.asPromise.remove(testKey)) // remove as promise
+        .then(result => expect(result).toBe(testVal))
+
+        // (chore)
+        .then(() => testVal)
+        .then(storage.asPromise.set(testKey))
+        .then(result => expect(result).toEqual(testVal))
+
+        // async keys
+        .then(storage.asPromise.keys)
+        .then(result => expect(result).toEqual([testKey]))
+
+        // async getAll
+        .then(storage.asPromise.getAll)
+        .then(result => expect(result).toEqual({[testKey]: testVal}))
+
+        // async removeAll
+        .then(storage.asPromise.removeAll)
+        .then($0 => expect(storage.length).toEqual(0))
+        ;
+    }))
+  );
+});
+
+describe('WebStorage interface', () => {
   let testKey = 'key',
     testKey2 = 'key2',
     testKey3 = 'key3',
@@ -94,9 +152,7 @@ describe('WebStorage Service Interface', () => {
     testVal3 = 'val3',
     overrideVal = 'oVal',
     testObjKey = 'valO',
-    testObjVal = {a: 'test'},
-    testPKey = 'keyP',
-    testPVal = 'valP';
+    testObjVal = {a: 'test'};
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -138,18 +194,12 @@ describe('WebStorage Service Interface', () => {
       // set object
       storage.set(testObjKey, testObjVal);
 
-      // set as promise TODO
-      // Promise.resolve(testPVal)
-      //   .then(storage.asPromise.set(testPKey))
-      //   .then(result => expect(result).toEqual(testPVal));
-
       expect(storage.set).toHaveBeenCalled();
       expect(storage.get(testKey)).toBe(testVal);
       expect(storage.get(testObjKey)).toEqual(testObjVal);
       expect(setResult).toBe(storage); // test chainability
 
       storage.remove(testObjKey);
-      // storage.remove(testPKey); TODO
     })
   ));
 
@@ -180,11 +230,6 @@ describe('WebStorage Service Interface', () => {
         [testKey]: testVal,
         [testKey2]: testVal2
       });
-
-      // get as promise
-      Promise.resolve()
-        .then(storage.asPromise.get(testKey))
-        .then(result => expect(result).toEqual(testVal));
 
       // get all keys
       expect(storage.keys()).toEqual([testKey, testKey2]);
@@ -385,10 +430,10 @@ describe('WebStorage Service event', () => {
       expect(storage.onRemoveAll).toEqual(jasmine.any(Subject));
 
       let spies = {
-          subscribeFn(val: number) {
-            expect(val).toEqual(2);
-          }
-        };
+        subscribeFn(val: number) {
+          expect(val).toEqual(2);
+        }
+      };
 
       spyOn(spies, 'subscribeFn').and.callThrough();
 

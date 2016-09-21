@@ -9,6 +9,7 @@
 * notification options: `get`, `set`, `remove`, `removeAll`
 * notifications broadcasting (1): `set`, `remove`, `removeAll`
 * rich and chainable API: `set`, `get`, `pull`, `has`, `length`, `remove`, `removeAll`, `forEach`, `keys`, `getAll` and more
+* "promised" interface with currying style API for one line usage in promises
 * errors emitter
 * well tested (all possible parts are covered)
 * built on top of TypeScript and ES6, packed via webpack

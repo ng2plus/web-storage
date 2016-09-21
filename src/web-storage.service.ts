@@ -49,7 +49,21 @@ export class WebStorageService {
       return () => utils.promisifyFn(this.get, [key, defaultVal], this);
     };
 
-    return {set, get};
+    const pull = <T>(key: string, defaultVal: any|KeyValIterator<any> = null): () => Promise<T> => {
+      return () => utils.promisifyFn(this.pull, [key, defaultVal], this);
+    };
+
+    const keys = (): Promise<string[]> => utils.promisifyFn(this.keys, null, this);
+
+    const getAll = (): Promise<StorageDictionary> => utils.promisifyFn(this.getAll, null, this);
+
+    const remove = <T>(key: string): () => Promise<T> => {
+      return () => utils.promisifyFn(this.remove, [key], this);
+    };
+
+    const removeAll = (): Promise<WebStorageService> => utils.promisifyFn(this.removeAll, null, this);
+
+    return {set, get, remove, removeAll, pull, keys, getAll};
   }
 
   addProvider(name: string, value: StorageProvider, useIt = false): WebStorageService {
