@@ -67,7 +67,7 @@ describe('WebStorage Providers', () => {
       spyOn(spies, 'onErrorFn').and.callThrough();
       storage.onError.subscribe(spies.onErrorFn);
 
-      storage.addProvider('cookie', new (class CookieProvider implements StorageProvider {
+      const addProviderResult = storage.addProvider('cookie', new (class CookieProvider implements StorageProvider {
         get(): WebStorage {
           return <WebStorage>{};
         }
@@ -76,9 +76,11 @@ describe('WebStorage Providers', () => {
           return Observable.empty<WebStorage>();
         }
       })());
-      storage.useProvider('cookie');
+      const useProviderResult = storage.useProvider('cookie');
 
       expect(spies.onErrorFn).toHaveBeenCalledTimes(0);
+      expect(addProviderResult).toBe(storage); // test chainability
+      expect(useProviderResult).toBe(storage); // test chainability
     }))
   );
 });
@@ -92,7 +94,9 @@ describe('WebStorage Service Interface', () => {
     testVal3 = 'val3',
     overrideVal = 'oVal',
     testObjKey = 'valO',
-    testObjVal = {a: 'test'};
+    testObjVal = {a: 'test'},
+    testPKey = 'keyP',
+    testPVal = 'valP';
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -104,6 +108,13 @@ describe('WebStorage Service Interface', () => {
   // afterEach(() => inject([WebStorageService], (storage: WebStorageService) => {
   //   storage.removeAll();
   // }));
+
+  it(`Should be configurable`,
+    inject([WebStorageService], (storage: WebStorageService) => {
+      // TODO update with concrete usage
+      expect(typeof storage.setup).toBe('function');
+    })
+  );
 
   it(`should be empty`,
     inject([WebStorageService], (storage: WebStorageService) => {
@@ -122,16 +133,23 @@ describe('WebStorage Service Interface', () => {
       spyOn(storage, 'set').and.callThrough();
 
       // set single value
-      storage.set(testKey, testVal);
+      const setResult = storage.set(testKey, testVal);
 
       // set object
       storage.set(testObjKey, testObjVal);
 
+      // set as promise TODO
+      // Promise.resolve(testPVal)
+      //   .then(storage.asPromise.set(testPKey))
+      //   .then(result => expect(result).toEqual(testPVal));
+
       expect(storage.set).toHaveBeenCalled();
       expect(storage.get(testKey)).toBe(testVal);
       expect(storage.get(testObjKey)).toEqual(testObjVal);
+      expect(setResult).toBe(storage); // test chainability
 
       storage.remove(testObjKey);
+      // storage.remove(testPKey); TODO
     })
   ));
 
@@ -163,6 +181,11 @@ describe('WebStorage Service Interface', () => {
         [testKey2]: testVal2
       });
 
+      // get as promise
+      Promise.resolve()
+        .then(storage.asPromise.get(testKey))
+        .then(result => expect(result).toEqual(testVal));
+
       // get all keys
       expect(storage.keys()).toEqual([testKey, testKey2]);
     })
@@ -188,10 +211,12 @@ describe('WebStorage Service Interface', () => {
     inject([WebStorageService], (storage: WebStorageService) => {
       spyOn(storage, 'removeAll').and.callThrough();
 
-      storage.removeAll();
+      const removeAllResult = storage.removeAll();
 
       expect(storage.removeAll).toHaveBeenCalled();
       expect(storage.length).toEqual(0);
+      expect(removeAllResult).toBe(storage); // test chainability
+      expect(storage.forEach(() => {})).toBe(storage); // test chainability
     })
   );
 

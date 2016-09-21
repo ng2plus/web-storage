@@ -1,5 +1,5 @@
 import {Injectable, Inject} from '@angular/core';
-import {utils} from './utils';
+import {KeyValIterator, utils} from './utils';
 import {WebStorage} from './web-storage';
 import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig, WebStorageEvent, WebStorageEventItem} from './web-storage.config';
 import {
@@ -14,7 +14,6 @@ import {WS_ERROR} from './web-storage.messages';
 import {checkStorage, addPrefixToKey} from './decorators';
 import {DefaultWebStorageProvider} from './web-storage-type';
 import {NOTIFY_OPTION} from './web-storage.config';
-import {KeyValIterator} from './utils';
 
 declare const BroadcastChannel;
 
@@ -39,6 +38,18 @@ export class WebStorageService {
   // @checkStorage(0) // basically it uses in this.keys()
   get length(): number {
     return this.keys().length;
+  }
+
+  get asPromise() {
+    const set = (key: string, replacer?: KeyValIterator<any>): (item: any) => Promise<any> => {
+      return (item: any) => utils.promisifyFn(this.set, [key, item, replacer], this).then($0 => item);
+    };
+
+    const get = <T>(key: string, defaultVal: any|KeyValIterator<any> = null): () => Promise<T> => {
+      return () => utils.promisifyFn(this.get, [key, defaultVal], this);
+    };
+
+    return {set, get};
   }
 
   addProvider(name: string, value: StorageProvider, useIt = false): WebStorageService {

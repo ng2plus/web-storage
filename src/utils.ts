@@ -31,6 +31,15 @@ export const utils = {
    */
   capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
+  },
+  promisifyFn(fn: (...args: any[]) => any, args: any[], context: any): Promise<any> {
+    try {
+      const result = fn.apply(context ? context : null, args);
+
+      return Promise.resolve(result);
+    } catch(e) {
+      return Promise.reject(e.message);
+    }
   }
 };
 
