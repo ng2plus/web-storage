@@ -62,7 +62,7 @@ module.exports = {
      *
      * See: http://webpack.github.io/docs/configuration.html#module-loaders
      */
-    loaders: [
+    rules: [
 
       /**
        * Tslint loader support for *.ts files
@@ -70,7 +70,7 @@ module.exports = {
        * See: https://github.com/wbuchwalter/tslint-loader
        */
       /*{
-        enforce: "right",
+        enforce: "pre",
         test: /\.ts$/,
         loader: 'tslint-loader',
         exclude: [helpers.root('node_modules')]
@@ -83,7 +83,7 @@ module.exports = {
        * See: https://github.com/webpack/source-map-loader
        */
       /*{
-        enforce: "right",
+        enforce: "pre",
         test: /\.js$/,
         loader: 'source-map-loader',
         exclude: [
@@ -99,8 +99,8 @@ module.exports = {
        */
       {
         test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        query: {
+        use: 'awesome-typescript-loader',
+        options: {
           compilerOptions: {
 
             // Remove TypeScript helpers to be injected
@@ -142,7 +142,7 @@ module.exports = {
        * See: https://github.com/deepsweet/istanbul-instrumenter-loader
        */
       /*{
-        enforce: "left",
+        enforce: "post",
         test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
         include: helpers.root('src'),
         exclude: [
