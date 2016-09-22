@@ -87,9 +87,7 @@ describe('WebStorage Providers', () => {
 
 describe('WebStorage as promises', () => {
   let testKey = 'key';
-  let testKey2 = 'key2';
   let testVal = 'val';
-  let testVal2 = 'val2';
 
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
@@ -137,8 +135,68 @@ describe('WebStorage as promises', () => {
 
         // async removeAll
         .then(storage.asPromise.removeAll)
-        .then($0 => expect(storage.length).toEqual(0))
-        ;
+        .then($0 => expect(storage.length).toEqual(0));
+    }))
+  );
+});
+
+describe('WebStorage as observables', () => {
+  let testKey = 'key';
+  let testVal = 'val';
+
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      WebStorageService,
+      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
+    ]
+  }));
+
+  it(`Should be used with observable methods`,
+    async(inject([WebStorageService], (storage: WebStorageService) => {
+      // observable set
+      Observable.fromPromise(storage.asPromise.set(testKey)(testVal))
+        .map(result => expect(result).toEqual(testVal))
+        .concat(
+          // observable pull
+          Observable.fromPromise(storage.asPromise.pull(testKey)())
+            .map(result => expect(result).toBe(testVal))
+        )
+        .concat(
+          // (chore)
+          Observable.fromPromise(storage.asPromise.set(testKey)(testVal))
+            .map(result => expect(result).toEqual(testVal))
+        )
+        .concat(
+          // observable get
+          Observable.fromPromise(storage.asPromise.get(testKey)())
+            .map(result => expect(result).toEqual(testVal))
+        )
+        .concat(
+          // observable remove
+          Observable.fromPromise(storage.asPromise.remove(testKey)())
+            .map(result => expect(result).toBe(testVal))
+        )
+        .concat(
+          // (chore)
+          Observable.fromPromise(storage.asPromise.set(testKey)(testVal))
+            .map(result => expect(result).toEqual(testVal))
+        )
+        .concat(
+          // observable keys
+          Observable.fromPromise(storage.asPromise.keys())
+            .map(result => expect(result).toEqual([testKey]))
+        )
+        .concat(
+          // observable getAll
+          Observable.fromPromise(storage.asPromise.getAll())
+            .map(result => expect(result).toEqual({[testKey]: testVal}))
+        )
+        .concat(
+          // observable removeAll
+          Observable.fromPromise(storage.asPromise.removeAll())
+            .map($0 => expect(storage.length).toEqual(0))
+        )
+        .subscribe();
     }))
   );
 });
