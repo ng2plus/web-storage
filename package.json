@@ -21,7 +21,8 @@
     "dev.compile": "npm run flow.clean && npm run flow.compile",
     "test": "karma start",
     "build": "webpack",
-    "preversion": "npm test"
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@angular/common": "2.0.0",
