@@ -161,6 +161,7 @@ export class WebStorageService {
   }
 
   // @checkStorage // basically it uses in this.forEach()
+  // TODO probably emits when the last item is removed from the storage
   removeAll(): WebStorageService {
     try {
       let count = 0;
