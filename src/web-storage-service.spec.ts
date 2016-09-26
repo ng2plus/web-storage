@@ -96,7 +96,7 @@ describe('WebStorage as promises', () => {
     ]
   }));
 
-  it(`Should be use in promise chain`,
+  it(`Should be used in promise chain`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
       Promise.resolve(testVal)
         // async set
