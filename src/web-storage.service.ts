@@ -60,15 +60,15 @@ export class WebStorageService {
       return () => utils.promisifyFn(this.pull, [key, defaultVal], this);
     };
 
-    const keys = (): Promise<string[]> => utils.promisifyFn(this.keys, null, this);
+    const keys = (): () => Promise<string[]> => () => utils.promisifyFn(this.keys, null, this);
 
-    const getAll = (): Promise<StorageDictionary> => utils.promisifyFn(this.getAll, null, this);
+    const getAll = (): () => Promise<StorageDictionary> => () => utils.promisifyFn(this.getAll, null, this);
 
     const remove = <T>(key: string): () => Promise<T> => {
       return () => utils.promisifyFn(this.remove, [key], this);
     };
 
-    const removeAll = (): Promise<WebStorageService> => utils.promisifyFn(this.removeAll, null, this);
+    const removeAll = (): () => Promise<WebStorageService> => () => utils.promisifyFn(this.removeAll, null, this);
 
     return {set, get, remove, removeAll, pull, keys, getAll};
   }
@@ -92,6 +92,8 @@ export class WebStorageService {
     return this;
   }
 
+  // TODO instance(config: WebStorageConfig): WebStorageService {}
+
   // TODO untested
   setup(config: WebStorageConfig): WebStorageService {
     this.mergeConfig(this.config, config);
@@ -102,6 +104,7 @@ export class WebStorageService {
 
   @checkStorage(null)
   @addPrefixToKey
+  // TODO untested KeyValIterator
   get<T>(key: string, defaultVal: any|KeyValIterator<any> = null): T {
     let item = this.getItem<T>(key, defaultVal);
 
@@ -112,6 +115,7 @@ export class WebStorageService {
 
   @checkStorage()
   @addPrefixToKey
+  // TODO untested KeyValIterator
   set(key: string, item: any, replacer?: KeyValIterator<any>): WebStorageService {
     let oldVal;
 
@@ -164,7 +168,7 @@ export class WebStorageService {
 
       this.ifNotifyThenDo(NOTIFY_OPTION.REMOVE_ALL, () => this.onRemoveAll.next(count));
     } catch(e) {
-      this.onError.next(e.message);
+      this.onError.next(e.message); // TODO emit an object {code, message}
     }
 
     return this;
@@ -207,6 +211,7 @@ export class WebStorageService {
     return all;
   }
 
+  // TODO can just single notification option be updated?
   private mergeConfig(defaultConfig, newConfig) {
     this.config = utils.merge(defaultConfig, newConfig);
   }

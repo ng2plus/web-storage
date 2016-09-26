@@ -1,6 +1,6 @@
 {
   "name": "@ng2plus/web-storage",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "main": "index.js",
   "description": "Ultimate web storage for Angular2",
   "keywords": [

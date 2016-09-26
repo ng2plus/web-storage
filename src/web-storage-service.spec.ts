@@ -9,7 +9,7 @@ import {
   WebStorageEventItem,
   WebStorageService
 } from '../index';
-import {LocalStorageProvider} from './providers/default/local-storage-provider';
+import {LocalStorageProvider} from './providers/default';
 
 describe('WebStorage Providers', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -126,15 +126,15 @@ describe('WebStorage as promises', () => {
         .then(result => expect(result).toEqual(testVal))
 
         // async keys
-        .then(storage.asPromise.keys)
+        .then(storage.asPromise.keys())
         .then(result => expect(result).toEqual([testKey]))
 
         // async getAll
-        .then(storage.asPromise.getAll)
+        .then(storage.asPromise.getAll())
         .then(result => expect(result).toEqual({[testKey]: testVal}))
 
         // async removeAll
-        .then(storage.asPromise.removeAll)
+        .then(storage.asPromise.removeAll())
         .then($0 => expect(storage.length).toEqual(0));
     }))
   );
@@ -183,17 +183,17 @@ describe('WebStorage as observables', () => {
         )
         .concat(
           // observable keys
-          Observable.fromPromise(storage.asPromise.keys())
+          Observable.fromPromise(storage.asPromise.keys()())
             .map(result => expect(result).toEqual([testKey]))
         )
         .concat(
           // observable getAll
-          Observable.fromPromise(storage.asPromise.getAll())
+          Observable.fromPromise(storage.asPromise.getAll()())
             .map(result => expect(result).toEqual({[testKey]: testVal}))
         )
         .concat(
           // observable removeAll
-          Observable.fromPromise(storage.asPromise.removeAll())
+          Observable.fromPromise(storage.asPromise.removeAll()())
             .map($0 => expect(storage.length).toEqual(0))
         )
         .subscribe();
