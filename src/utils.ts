@@ -9,7 +9,7 @@ export const utils = {
     let merged: T = Object.assign({}, defaults);
 
     for (let val in merged) {
-      if (merged.hasOwnProperty(val) && obj.hasOwnProperty(val) && obj[val] !== null) {
+      if (merged.hasOwnProperty(val) && Object.prototype.hasOwnProperty.call(obj, val) && obj[val] !== null) {
         merged[val] = obj[val];
       }
     }
