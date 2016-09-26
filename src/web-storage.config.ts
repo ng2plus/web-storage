@@ -27,8 +27,8 @@ export const webStorageConfigDefault: WebStorageConfig = utils.dictionary<WebSto
 // ############ INTERFACES ############
 
 export interface WebStorageConfig {
-  deserializeObjects?: boolean,
-  deserializeNumberLikeStrings?: boolean,
+  // deserializeObjects?: boolean,
+  // deserializeNumberLikeStrings?: boolean,
   prefix?: string,
   provider?: DefaultWebStorageProvider|string,
   notifyOn?: NotifyOptions, // emit change, update, add, etc. events

@@ -1,7 +1,13 @@
 import {Injectable, Inject} from '@angular/core';
 import {KeyValIterator, utils} from './utils';
 import {WebStorage} from './web-storage';
-import {WEB_STORAGE_SERVICE_CONFIG, WebStorageConfig, WebStorageEvent, WebStorageEventItem} from './web-storage.config';
+import {
+  WEB_STORAGE_SERVICE_CONFIG,
+  WebStorageConfig,
+  WebStorageEvent,
+  WebStorageEventItem,
+  webStorageConfigDefault
+} from './web-storage.config';
 import {
   LocalStorageProvider,
   localStorageProviderName,
@@ -31,6 +37,7 @@ export class WebStorageService {
   private providers: {[index: string]: StorageProvider} = {};
 
   constructor(@Inject(WEB_STORAGE_SERVICE_CONFIG) private config: WebStorageConfig) {
+    this.mergeConfig(webStorageConfigDefault, config);
     this.addDefaultProviders();
     this.init();
   }
@@ -85,8 +92,9 @@ export class WebStorageService {
     return this;
   }
 
+  // TODO untested
   setup(config: WebStorageConfig): WebStorageService {
-    this.config = utils.merge(this.config, config);
+    this.mergeConfig(this.config, config);
     this.init();
 
     return this;
@@ -197,6 +205,10 @@ export class WebStorageService {
     });
 
     return all;
+  }
+
+  private mergeConfig(defaultConfig, newConfig) {
+    this.config = utils.merge(defaultConfig, newConfig);
   }
 
   private getItem<T>(prefixedKey: string, defaultVal: any|KeyValIterator<any> = null): T {
