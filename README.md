@@ -14,7 +14,7 @@
 * errors emitter
 * well tested (all possible parts are covered)
 * built on top of TypeScript and ES6, packed via webpack
-* clean package after installing without redundant trash
+* clean package after `npm install` without redundant trash
 
 > (1) broadcasting is available via [BroadcastChannel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API). You have to make sure
 that your target platform supports the API in order to use this feature. You also can include polyfill that adds `BroadcastChannel`
@@ -459,11 +459,11 @@ Observable.fromPromise(webStorage.asPromise.set('name')('Octocat'))
 
 ### Custom Providers
 
-With help on [`addProvider`](#addProvider) method you can add custom storage implementation. Let's implement simple in memory key-value storage.
+With help on [`addProvider`](#addprovider) method you can add custom storage implementation. Let's implement simple in memory key-value storage.
 
 First of all a provider should implement [`StorageProvider`](src/providers/storage-provider.ts) interface which requires to implement two methods: `get` and `validate`. `get` method is used to retrieve an instance of provider and `validate` method is used to check if the provider is available in current context (it calls only once, each time when `useProvider` is called or the 3rd parameter of `addProvider` method is `true`).
 
-Method `get` has to return an instance of class which implements [`WebStorage`](web-storage.ts) interface.
+Method `get` has to return an instance of class which implements [`WebStorage`](src/web-storage.ts) interface.
 
 ```javascript
 import {WebStorage} from '@ng2plus/web-storage';
