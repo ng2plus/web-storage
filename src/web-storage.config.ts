@@ -14,6 +14,7 @@ export const WEB_STORAGE_SERVICE_CONFIG = new OpaqueToken('WEB_STORAGE_SERVICE_C
 export const webStorageConfigDefault: WebStorageConfig = utils.dictionary<WebStorageConfig>({
   // deserializeObjects: true, // if someone needs this, open an issue
   // deserializeNumberLikeStrings: true, // if someone needs this, open an issue
+  // silentErrors: true, // TODO all errors are suppressed if don't subscribe to observable (it's current behavior)
   prefix: '__',
   provider: 'localStorage',
   notifyOn: {
