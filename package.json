@@ -20,16 +20,12 @@
     "flow.compile:common": "tsc -p tsconfig.json",
     "dev.compile": "npm run flow.clean && npm run flow.compile",
     "test": "karma start",
-    "build": "webpack",
+    "build": "npm run dev.compile",
+    "prepublish": "npm run build && npm run test",
     "preversion": "npm test",
     "postversion": "git push && git push --tags"
   },
   "devDependencies": {
-    "@angular/common": "2.0.0",
-    "@angular/compiler": "2.0.0",
-    "@angular/core": "2.0.0",
-    "@angular/platform-browser": "2.0.0",
-    "@angular/platform-browser-dynamic": "2.0.0",
     "@types/core-js": "^0.9.34",
     "@types/jasmine": "^2.2.33",
     "@types/node": "^6.0.40",
@@ -44,17 +40,24 @@
     "karma-jasmine": "^1.0.2",
     "karma-mocha-reporter": "^2.1.0",
     "karma-webpack": "1.8.0",
-    "rxjs": "5.0.0-beta.12",
     "ts-helpers": "1.1.1",
     "typescript": "2.0.2",
-    "webpack": "2.1.0-beta.25",
-    "zone.js": "0.6.21"
+    "webpack": "2.1.0-beta.25"
   },
   "peerDependencies": {
-    "@angular/common": "2.0.0",
-    "@angular/compiler": "2.0.0",
-    "@angular/core": "2.0.0",
-    "@angular/platform-browser": "2.0.0",
-    "@angular/platform-browser-dynamic": "2.0.0"
+    "@angular/common": "2.1.0-beta.0",
+    "@angular/compiler": "2.1.0-beta.0",
+    "@angular/core": "2.1.0-beta.0",
+    "@angular/platform-browser": "2.1.0-beta.0",
+    "@angular/platform-browser-dynamic": "2.1.0-beta.0"
+  },
+  "dependencies": {
+    "@angular/common": "2.1.0-beta.0",
+    "@angular/compiler": "2.1.0-beta.0",
+    "@angular/core": "2.1.0-beta.0",
+    "@angular/platform-browser": "2.1.0-beta.0",
+    "@angular/platform-browser-dynamic": "2.1.0-beta.0",
+    "zone.js": "^0.6.21",
+    "rxjs": "5.0.0-beta.12"
   }
 }
