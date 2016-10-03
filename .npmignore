@@ -9,6 +9,8 @@ coverage
 # configs
 typings.json
 tsconfig.json
+/config
+webpack.config.js
 
 #typescript sources
 *.ts
