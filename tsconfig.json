@@ -10,7 +10,12 @@
     "experimentalDecorators": true,
     "declaration": true,
     "noEmitHelpers": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "lib": [
+      "dom",
+      "es6",
+      "es2016.array.include"
+    ]
   },
   "files": [
     "index.ts"
@@ -18,9 +23,6 @@
   "exclude": [
     "node_modules",
     "dist"
-  ],
-  "lib": [
-    "es6"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
