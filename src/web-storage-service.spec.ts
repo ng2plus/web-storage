@@ -1,5 +1,10 @@
 import {TestBed, inject, async} from '@angular/core/testing';
-import {ReplaySubject, Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/observable/empty';
+import {Subject} from 'rxjs/Subject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {
   WS_ERROR,
   WebStorage,

@@ -1,6 +1,6 @@
 import {StorageProvider} from './storage-provider';
 import {WebStorage} from '../web-storage';
-import {Observable} from 'rxjs';
+import {Observable} from 'rxjs/Observable';
 
 export abstract class WindowStorageProvider implements StorageProvider {
   protected abstract providerName: string;

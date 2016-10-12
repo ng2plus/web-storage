@@ -15,7 +15,10 @@ import {
   sessionStorageProviderName,
   StorageProvider
 } from './providers';
-import {Observable, ReplaySubject, Subject} from 'rxjs';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {Subject} from 'rxjs/Subject';
 import {WS_ERROR} from './web-storage.messages';
 import {checkStorage, addPrefixToKey} from './decorators';
 import {DefaultWebStorageProvider} from './web-storage-type';
