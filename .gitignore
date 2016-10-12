@@ -12,3 +12,6 @@ src/**/*.d.ts
 index.js
 index.d.ts
 index.js.map
+
+# yarn package manager
+.yarnclean
