@@ -21,7 +21,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"bundles\"",
+    "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"index.+(js|d.ts|js.map)\" \"bundles\"",
     "flow.build:dist": "webpack --config config/webpack.bundle.js && node node_modules/del-cli/cli \"bundles/src\" \"bundles/**/*.d.ts\"",
     "flow.build": "tsc -p tsconfig.json",
     "preversion": "npm test",
