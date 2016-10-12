@@ -1,8 +1,14 @@
+# folders
 .idea
 node_modules
+dist
+
+# wildcard
 src/**/*.js
 src/**/*.js.map
 src/**/*.d.ts
+
+# single files
 index.js
 index.d.ts
 index.js.map

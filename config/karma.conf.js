@@ -3,7 +3,7 @@
  */
 
 module.exports = function(config) {
-  const testWebpackConfig = require('./config/webpack.test.js');
+  const testWebpackConfig = require('./webpack.test.js');
 
   const configuration = {
 
@@ -23,15 +23,15 @@ module.exports = function(config) {
     /*
      * list of files / patterns to load in the browser
      *
-     * we are building the test environment in ./spec-bundle.js
+     * we are building the test environment in ./karma-shim.js
      */
-    files: [ { pattern: './config/spec-bundle.js', watched: false } ],
+    files: [ { pattern: './karma-shim.js', watched: false } ],
 
     /*
      * preprocess matching files before serving them to the browser
      * available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
      */
-    preprocessors: { './config/spec-bundle.js': [/*'coverage', */'webpack'/*, 'sourcemap'*/] },
+    preprocessors: { './karma-shim.js': [/*'coverage', */'webpack'/*, 'sourcemap'*/] },
 
     // Webpack Config at ./webpack.test.js
     webpack: testWebpackConfig,

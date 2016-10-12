@@ -1,14 +1,12 @@
 /**
  * Webpack Plugins
  */
-const ProvidePlugin = require('webpack/lib/ProvidePlugin');
-const DefinePlugin = require('webpack/lib/DefinePlugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 
 /**
  * Webpack configuration
  *
- * See: http://webpack.github.io/docs/configuration.html#cli
+ * @see http://webpack.github.io/docs/configuration.html#cli
  */
 module.exports = {
 
@@ -16,21 +14,21 @@ module.exports = {
    * Source map for Karma from the help of karma-sourcemap-loader &  karma-webpack
    *
    * Do not change, leave as is or it wont work.
-   * See: https://github.com/webpack/karma-webpack#source-maps
+   * @see https://github.com/webpack/karma-webpack#source-maps
    */
   devtool: 'inline-source-map',
 
   /**
    * Options affecting the resolving of modules.
    *
-   * See: http://webpack.github.io/docs/configuration.html#resolve
+   * @see http://webpack.github.io/docs/configuration.html#resolve
    */
   resolve: {
 
     /**
      * An array of extensions that should be used to resolve modules.
      *
-     * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
+     * @see http://webpack.github.io/docs/configuration.html#resolve-extensions
      */
     extensions: ['.ts', '.js'] // configuration.resolve.extensions[0] should not be empty
 
@@ -39,7 +37,7 @@ module.exports = {
   /**
    * Options affecting the normal modules.
    *
-   * See: http://webpack.github.io/docs/configuration.html#module
+   * @see http://webpack.github.io/docs/configuration.html#module
    */
   module: {
     /**
@@ -48,13 +46,13 @@ module.exports = {
      * IMPORTANT: The loaders here are resolved relative to the resource which they are applied to.
      * This means they are not resolved relative to the configuration file.
      *
-     * See: http://webpack.github.io/docs/configuration.html#module-loaders
+     * @see http://webpack.github.io/docs/configuration.html#module-loaders
      */
     rules: [
       /**
        * Typescript loader support for .ts and Angular 2 async routes via .async.ts
        *
-       * See: https://github.com/s-panferov/awesome-typescript-loader
+       * @see https://github.com/s-panferov/awesome-typescript-loader
        */
       {
         test: /\.ts$/,
@@ -75,7 +73,7 @@ module.exports = {
   /**
    * Add additional plugins to the compiler.
    *
-   * See: http://webpack.github.io/docs/configuration.html#plugins
+   * @see http://webpack.github.io/docs/configuration.html#plugins
    */
   plugins: [
     new LoaderOptionsPlugin({
@@ -84,7 +82,7 @@ module.exports = {
          * Static analysis linter for TypeScript advanced options configuration
          * Description: An extensible linter for the TypeScript language.
          *
-         * See: https://github.com/wbuchwalter/tslint-loader
+         * @see https://github.com/wbuchwalter/tslint-loader
          */
         tslint: {
           emitErrors: false,
@@ -99,7 +97,7 @@ module.exports = {
    * Include polyfills or mocks for various node stuff
    * Description: Node configuration
    *
-   * See: https://webpack.github.io/docs/configuration.html#node
+   * @see https://webpack.github.io/docs/configuration.html#node
    */
   node: {
     global: true,

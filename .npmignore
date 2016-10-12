@@ -1,5 +1,4 @@
 .idea
-typings
 
 # testing
 karma.conf.js
@@ -7,10 +6,8 @@ test.bundle.js
 coverage
 
 # configs
-typings.json
 tsconfig.json
 /config
-webpack.config.js
 
 #typescript sources
 *.ts
