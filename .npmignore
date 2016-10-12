@@ -1,7 +1,6 @@
 .idea
 
 # testing
-karma.conf.js
 test.bundle.js
 coverage
 
@@ -11,6 +10,8 @@ tsconfig.json
 
 #typescript sources
 *.ts
-*.js.map
 !*.d.ts
 !/src/**/*.d.ts
+
+# misc
+.editorconfig

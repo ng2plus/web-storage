@@ -13,7 +13,7 @@ import {
   webStorageConfigDefault,
   WebStorageEventItem,
   WebStorageService
-} from './index';
+} from '../index';
 import {LocalStorageProvider} from './providers/default';
 
 describe('WebStorage Providers', () => {

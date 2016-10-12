@@ -9,8 +9,8 @@ const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
 module.exports = {
   entry: {
-    'bundle.umd': './src/index.ts',
-    'bundle.umd.min': './src/index.ts'
+    'bundle.umd': './index.ts',
+    'bundle.umd.min': './index.ts'
   },
 
   /**
