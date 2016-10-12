@@ -24,6 +24,13 @@ function to `window`. If `BroadcastChannel` is not supported by the platform and
 
 `npm install @ng2plus/web-storage`
 
+After installation UMD-style modules will be available too:
+
+```
+./node_modules/@ng2plus/web-storage/bundles/web-storage.umd.js
+./node_modules/@ng2plus/web-storage/bundles/web-storage.umd.min.js
+```
+
 ## Pre-requirements
 
 You should manually shim `ES6` (`es2015`) features such as [`Promise`](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Promise), [`startsWith`](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith) and also `ES7` (`es2016`) feature [`includes`](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/includes).
@@ -566,13 +573,3 @@ class CustomStorageProvider implements StorageProvider {
 // finally, register and use new provider
 storage.addProvider('customProvider', new CustomStorageProvider(), true);
 ```
-
-## Limitations
-
-### Lack of build file
-
-Currently there is a little mess with webpack config and as the result there is no single build file.
-
-But you still can safely use this library in your `TypeScript` project or in any project where `require`d modules includes in your build file automatically.
-
-Anyway webpack config will be updated soon.

@@ -1,7 +1,7 @@
 {
   "name": "@ng2plus/web-storage",
   "version": "0.3.2",
-  "main": "dist/bundle.umd.js",
+  "main": "bundles/web-storage.umd.js",
   "typings": "index.d.ts",
   "description": "Ultimate web storage for Angular2",
   "keywords": [
@@ -21,8 +21,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"dist\"",
-    "flow.build:dist": "webpack --config config/webpack.bundle.js && node node_modules/del-cli/cli \"dist/src\" \"dist/**/*.d.ts\"",
+    "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"bundles\"",
+    "flow.build:dist": "webpack --config config/webpack.bundle.js && node node_modules/del-cli/cli \"bundles/src\" \"bundles/**/*.d.ts\"",
     "flow.build": "tsc -p tsconfig.json",
 
     "preversion": "npm test",

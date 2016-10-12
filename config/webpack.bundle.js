@@ -9,8 +9,8 @@ const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
 module.exports = {
   entry: {
-    'bundle.umd': './index.ts',
-    'bundle.umd.min': './index.ts'
+    'web-storage.umd': './index.ts',
+    'web-storage.umd.min': './index.ts'
   },
 
   /**
@@ -58,7 +58,7 @@ module.exports = {
      *
      * @see http://webpack.github.io/docs/configuration.html#output-path
      */
-    path: path.resolve('dist'),
+    path: path.resolve('bundles'),
 
     /**
      * Specifies the name of each output file on disk.
