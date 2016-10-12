@@ -1,6 +1,6 @@
 {
   "name": "@ng2plus/web-storage",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "main": "bundles/web-storage.umd.js",
   "typings": "index.d.ts",
   "description": "Ultimate web storage for Angular2",
@@ -24,12 +24,10 @@
     "flow.clean": "node node_modules/del-cli/cli \"src/**/*.+(js|d.ts|js.map)\" \"bundles\"",
     "flow.build:dist": "webpack --config config/webpack.bundle.js && node node_modules/del-cli/cli \"bundles/src\" \"bundles/**/*.d.ts\"",
     "flow.build": "tsc -p tsconfig.json",
-
     "preversion": "npm test",
     "postversion": "git push && git push --tags",
     "prepublish": "npm run test && npm run build",
     "postpublish": "npm run flow.clean",
-
     "build": "npm run flow.clean && npm run flow.build && npm run flow.build:dist",
     "test": "karma start config/karma.conf.js"
   },
