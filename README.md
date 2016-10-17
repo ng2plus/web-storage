@@ -20,6 +20,8 @@
 that your target platform supports the API in order to use this feature. You also can include polyfill that adds `BroadcastChannel`
 function to `window`. If `BroadcastChannel` is not supported by the platform and there is no polyfill fot that then notifications broadcasting will be disabled.
 
+[Demo time!](http://embed.plnkr.co/2EaicczvXyV3mnqOZjVx/)
+
 ## Installation
 
 `npm install @ng2plus/web-storage`
