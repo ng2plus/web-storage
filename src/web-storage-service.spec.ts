@@ -12,17 +12,38 @@ import {
   WEB_STORAGE_SERVICE_CONFIG,
   webStorageConfigDefault,
   WebStorageEventItem,
-  WebStorageService
+  WebStorageService,
+  WebStoragePipe
 } from '../index';
 import {LocalStorageProvider} from './providers/default';
 
-describe('WebStorage Providers', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      WebStorageService,
-      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
-    ]
+const provideWebStorage = () => TestBed.configureTestingModule({
+  providers: [
+    WebStorageService,
+    {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
+  ]
+});
+
+describe('WebStorage Pipe', () => {
+  beforeEach(() => provideWebStorage());
+
+  it('returns key from storage', inject([WebStorageService], (storage: WebStorageService) => {
+    let pipe = new WebStoragePipe(storage);
+    let key = 'abc';
+    let val = 'ABC';
+
+    expect(pipe.transform(key)).toBeNull(); // no value in storage yet
+    expect(pipe.transform(key, 'absent')).toBe('absent');
+
+    storage.set(key, val);
+    expect(pipe.transform(key)).toBe(val);
+
+    storage.removeAll(); // service
   }));
+});
+
+describe('WebStorage Providers', () => {
+  beforeEach(() => provideWebStorage());
 
   it(`should switch between default providers`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
@@ -94,12 +115,7 @@ describe('WebStorage as promises', () => {
   let testKey = 'key';
   let testVal = 'val';
 
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      WebStorageService,
-      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
-    ]
-  }));
+  beforeEach(() => provideWebStorage());
 
   it(`Should be used in promise chain`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
@@ -149,12 +165,7 @@ describe('WebStorage as observables', () => {
   let testKey = 'key';
   let testVal = 'val';
 
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      WebStorageService,
-      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
-    ]
-  }));
+  beforeEach(() => provideWebStorage());
 
   it(`Should be used with observable methods`,
     async(inject([WebStorageService], (storage: WebStorageService) => {
@@ -217,12 +228,7 @@ describe('WebStorage interface', () => {
     testObjKey = 'valO',
     testObjVal = {a: 'test'};
 
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      WebStorageService,
-      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
-    ]
-  }));
+  beforeEach(() => provideWebStorage());
 
   // afterEach(() => inject([WebStorageService], (storage: WebStorageService) => {
   //   storage.removeAll();
@@ -336,12 +342,7 @@ describe('WebStorage Service event', () => {
     testKey2 = 'key2',
     testVal2 = 'val2';
 
-  beforeEach(() => TestBed.configureTestingModule({
-    providers: [
-      WebStorageService,
-      {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
-    ]
-  }));
+  beforeEach(() => provideWebStorage());
 
   it(`'onError' fires`,
     async(inject([WebStorageService], (storage: WebStorageService) => {

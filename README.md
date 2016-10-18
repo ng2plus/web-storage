@@ -4,6 +4,7 @@
 
 * custom prefix
 * built-in `localStorage` and `sessionStorage` providers
+* `webStorage` Pipe
 * custom providers
 * switching providers on the fly
 * notification options: `get`, `set`, `remove`, `removeAll`
@@ -45,13 +46,15 @@ Include `WebStorageService` and its config in your root module.
 ...
 import {
   WebStorageService,
+  WEB_STORAGE_DECLARATIONS,
   WEB_STORAGE_SERVICE_CONFIG,
   webStorageConfigDefault
 } from '@ng2plus/web-storage';
 
 @NgModule({
   ...
-  providers   : [
+  declarations: [...WEB_STORAGE_DECLARATIONS],
+  providers: [
     WebStorageService,
     {provide: WEB_STORAGE_SERVICE_CONFIG, useValue: webStorageConfigDefault}
   ]
@@ -147,7 +150,7 @@ Now you can use it inside your Angular2 application.
 import {WebStorageService} from '@ng2plus/web-storage';
 
 @Component({
-  ...
+  template: '\u2764 {{'favorite_framework' | webStorage}}'
 })
 export class FavoriteFramework {
   constructor(private webStorage: WebStorageService) {
