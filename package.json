@@ -1,6 +1,6 @@
 {
   "name": "@ng2plus/web-storage",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "main": "bundles/web-storage.umd.js",
   "typings": "index.d.ts",
   "description": "Ultimate web storage for Angular2",
